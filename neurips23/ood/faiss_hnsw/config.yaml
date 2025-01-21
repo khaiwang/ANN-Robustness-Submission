@@ -1,0 +1,162 @@
+# text2image-10M:
+#   faiss_hnsw:
+#     docker-tag: neurips23-ood-faiss_hnsw
+#     module: neurips23.ood.faiss_hnsw.faiss_hnsw
+#     constructor: FaissHNSW
+#     base-args: ["angular"]
+#     run-groups:
+#       base:
+#         args: |
+#           [{"M": 32, "efConstruction": 500}]
+#         query-args: |
+#           [{"ef": 64}, 
+#           {"ef": 128},
+#           {"ef": 256},
+#           {"ef": 512},
+#           {"ef": 394},
+#           {"ef": 192},
+#           {"ef": 96},
+#           {"ef": 320}
+#           ]
+
+text2image-10M:
+  faiss_hnsw:
+    docker-tag: neurips23-ood-faiss_hnsw
+    module: neurips23.ood.faiss_hnsw.faiss_hnsw
+    constructor: FaissHNSW
+    base-args: ["angular"]
+    run-groups:
+      base:
+        args: |
+          [{"M": 32, "efConstruction": 500}]
+        query-args: |
+          [
+          {"ef": 32},
+          {"ef": 64},
+          {"ef": 128}, 
+          {"ef": 256},
+          {"ef": 512},
+          {"ef": 1024},
+          {"ef": 2048},
+          {"ef": 4096}
+          ]
+      base-1:
+        args: |
+          [{"M": 16, "efConstruction": 500}]
+        query-args: |
+          [
+          {"ef": 32},
+          {"ef": 64},
+          {"ef": 128}, 
+          {"ef": 256},
+          {"ef": 512},
+          {"ef": 1024},
+          {"ef": 2048},
+          {"ef": 4096}]
+      base-2:
+        args: |
+          [{"M": 64, "efConstruction": 500}]
+        query-args: |
+          [
+          {"ef": 32},
+          {"ef": 64},
+          {"ef": 128}, 
+          {"ef": 256},
+          {"ef": 512},
+          {"ef": 1024},
+          {"ef": 2048},
+          {"ef": 4096}]
+      base-3:
+        args: |
+          [{"M": 128, "efConstruction": 500}]
+        query-args: |
+          [
+          {"ef": 32},
+          {"ef": 64},
+          {"ef": 128}, 
+          {"ef": 256},
+          {"ef": 512},
+          {"ef": 1024},
+          {"ef": 2048},
+          {"ef": 4096}]
+
+
+msspacev-10M:
+  faiss_hnsw:
+    docker-tag: neurips23-ood-faiss_hnsw
+    module: neurips23.ood.faiss_hnsw.faiss_hnsw
+    constructor: FaissHNSW
+    base-args: ["@metric"]
+    run-groups:
+      base:
+        args: |
+          [{"M": 32, "efConstruction": 300}]
+        query-args: |
+          [
+          {"ef": 30}, 
+          {"ef": 40},
+          {"ef": 60},
+          {"ef": 80},
+          {"ef": 100},
+          {"ef": 120},
+          {"ef": 140},
+          {"ef": 160},
+          {"ef": 180},
+          {"ef": 200},
+          {"ef": 220},
+          {"ef": 240},
+          {"ef": 260},
+          {"ef": 280},
+          {"ef": 300}
+          ]
+
+
+deep-10M:
+  faiss_hnsw:
+    docker-tag: neurips23-ood-faiss_hnsw
+    module: neurips23.ood.faiss_hnsw.faiss_hnsw
+    constructor: FaissHNSW
+    base-args: ["angular"]
+    run-groups:
+      base:
+        args: |
+          [{"M": 16, "efConstruction": 300}]
+        query-args: |
+          [
+          {"ef": 20}, 
+          {"ef": 40},
+          {"ef": 60},
+          {"ef": 80},
+          {"ef": 100},
+          {"ef": 120},
+          {"ef": 140},
+          {"ef": 160},
+          {"ef": 180},
+          {"ef": 200},
+          {"ef": 220},
+          {"ef": 240},
+          {"ef": 260},
+          {"ef": 280},
+          {"ef": 300}
+          ]
+      base-1:
+        args: |
+          [{"M": 16, "efConstruction": 300}]
+        query-args: |
+          [
+          {"ef": 20}, 
+          {"ef": 40},
+          {"ef": 60},
+          {"ef": 80},
+          {"ef": 100},
+          {"ef": 120},
+          {"ef": 140},
+          {"ef": 160},
+          {"ef": 180},
+          {"ef": 200},
+          {"ef": 220},
+          {"ef": 240},
+          {"ef": 260},
+          {"ef": 280},
+          {"ef": 300}
+          ]

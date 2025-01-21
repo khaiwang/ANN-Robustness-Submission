@@ -1,0 +1,311 @@
+# text2image-10M:
+#   faiss-ivfpqfs:
+#     docker-tag: neurips23-ood-faiss
+#     module: neurips23.ood.faiss.faiss
+#     base-args: ['angular']
+#     constructor: FaissIVFPQfs
+#     disabled: false
+#     run-groups:
+#       base:
+#         args: |
+#           [{"n_list" : 10000}]
+
+#         query-args: |
+#           [{"n_probe": 4, "k_reorder": 0}, 
+#            {"n_probe": 8, "k_reorder": 0},
+#            {"n_probe": 16, "k_reorder": 0},
+#            {"n_probe": 32, "k_reorder": 0},
+#            {"n_probe": 64, "k_reorder": 0},
+#            {"n_probe": 128, "k_reorder": 0},
+#            {"n_probe": 4, "k_reorder": 10},
+#            {"n_probe": 8, "k_reorder": 10},
+#            {"n_probe": 16, "k_reorder": 10},
+#            {"n_probe": 32, "k_reorder": 10},
+#            {"n_probe": 64, "k_reorder": 10},
+#            {"n_probe": 128, "k_reorder": 10},
+#            {"n_probe": 4, "k_reorder": 100}, 
+#            {"n_probe": 8, "k_reorder": 100},
+#            {"n_probe": 16, "k_reorder": 100},
+#            {"n_probe": 32, "k_reorder": 100},
+#            {"n_probe": 64, "k_reorder": 100},
+#            {"n_probe": 128, "k_reorder": 100},
+#            {"n_probe": 4, "k_reorder": 1000},
+#            {"n_probe": 8, "k_reorder": 1000},
+#            {"n_probe": 16, "k_reorder": 1000},
+#            {"n_probe": 32, "k_reorder": 1000},
+#            {"n_probe": 64, "k_reorder": 1000},
+#            {"n_probe": 128, "k_reorder": 1000}
+#           ]
+#   faiss-ivf:
+#     docker-tag: neurips23-ood-faiss
+#     module: neurips23.ood.faiss.faiss
+#     base-args: ['angular']
+#     constructor: FaissIVF
+#     disabled: false
+#     run-groups:
+#       base:
+#         args: |
+#           [{"n_list" : 10000}]
+#         query-args: |
+#           [
+#            {"n_probe": 10},
+#            {"n_probe": 20},
+#            {"n_probe": 30}, 
+#            {"n_probe": 40},
+#            {"n_probe": 50},
+#            {"n_probe": 60},
+#            {"n_probe": 70},
+#            {"n_probe": 80}
+#           ]
+
+text2image-10M:
+  faiss-ivfpqfs:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ['angular']
+    constructor: FaissIVFPQfs
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 10000}]
+
+        query-args: |
+          [{"n_probe": 2, "k_reorder": 0},
+           {"n_probe": 4, "k_reorder": 0}, 
+           {"n_probe": 8, "k_reorder": 0},
+           {"n_probe": 16, "k_reorder": 0},
+           {"n_probe": 32, "k_reorder": 0},
+           {"n_probe": 64, "k_reorder": 0},
+           {"n_probe": 128, "k_reorder": 0},
+           {"n_probe": 256, "k_reorder": 0},
+           {"n_probe": 512, "k_reorder": 0},
+           {"n_probe": 2, "k_reorder": 10},
+           {"n_probe": 4, "k_reorder": 10},
+           {"n_probe": 8, "k_reorder": 10},
+           {"n_probe": 16, "k_reorder": 10},
+           {"n_probe": 32, "k_reorder": 10},
+           {"n_probe": 64, "k_reorder": 10},
+           {"n_probe": 128, "k_reorder": 10},
+           {"n_probe": 256, "k_reorder": 10},
+           {"n_probe": 512, "k_reorder": 10},
+           {"n_probe": 2, "k_reorder": 100},
+           {"n_probe": 4, "k_reorder": 100}, 
+           {"n_probe": 8, "k_reorder": 100},
+           {"n_probe": 16, "k_reorder": 100},
+           {"n_probe": 32, "k_reorder": 100},
+           {"n_probe": 64, "k_reorder": 100},
+           {"n_probe": 128, "k_reorder": 100},
+           {"n_probe": 256, "k_reorder": 100},
+           {"n_probe": 512, "k_reorder": 100},
+           {"n_probe": 2, "k_reorder": 1000},
+           {"n_probe": 4, "k_reorder": 1000},
+           {"n_probe": 8, "k_reorder": 1000},
+           {"n_probe": 16, "k_reorder": 1000},
+           {"n_probe": 32, "k_reorder": 1000},
+           {"n_probe": 64, "k_reorder": 1000},
+           {"n_probe": 128, "k_reorder": 1000},
+           {"n_probe": 256, "k_reorder": 1000},
+           {"n_probe": 512, "k_reorder": 1000}
+          ]
+  faiss-ivf:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ['angular']
+    constructor: FaissIVF
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 20000}]
+        query-args: |
+          [
+           {"n_probe": 1},
+           {"n_probe": 2},
+           {"n_probe": 4},
+           {"n_probe": 8},
+           {"n_probe": 16},
+           {"n_probe": 32},
+           {"n_probe": 64},
+           {"n_probe": 128},
+           {"n_probe": 256},
+           {"n_probe": 512},
+           {"n_probe": 1024}
+          ]
+      base-2:
+        args: |
+          [{"n_list" : 3000}]
+        query-args: |
+          [
+           {"n_probe": 1},
+           {"n_probe": 2},
+           {"n_probe": 4},
+           {"n_probe": 8},
+           {"n_probe": 16},
+           {"n_probe": 32},
+           {"n_probe": 64},
+           {"n_probe": 128},
+           {"n_probe": 256},
+           {"n_probe": 512},
+           {"n_probe": 1024}
+          ]
+      base-3:
+        args: |
+          [{"n_list" : 40000}]
+        query-args: |
+          [
+           {"n_probe": 1},
+           {"n_probe": 2},
+           {"n_probe": 4},
+           {"n_probe": 8},
+           {"n_probe": 16},
+           {"n_probe": 32},
+           {"n_probe": 64},
+           {"n_probe": 128},
+           {"n_probe": 256},
+           {"n_probe": 512},
+           {"n_probe": 1024}
+          ]
+      base-4:
+        args: |
+          [{"n_list" : 100000}]
+        query-args: |
+          [
+           {"n_probe": 1},
+           {"n_probe": 2},
+           {"n_probe": 4},
+           {"n_probe": 8},
+           {"n_probe": 16},
+           {"n_probe": 32},
+           {"n_probe": 64},
+           {"n_probe": 128},
+           {"n_probe": 256},
+           {"n_probe": 512},
+           {"n_probe": 1024}
+          ]
+
+msspacev-10M:
+  faiss-ivfpqfs:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ["@metric"]
+    constructor: FaissIVFPQfs
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 10000}]
+
+        query-args: |
+          [{"n_probe": 1, "k_reorder": 0},
+           {"n_probe": 5, "k_reorder": 0},
+           {"n_probe": 10, "k_reorder": 0},
+           {"n_probe": 50, "k_reorder": 0},
+           {"n_probe": 100, "k_reorder": 0},
+           {"n_probe": 200, "k_reorder": 0},
+           {"n_probe": 1, "k_reorder": 10},
+           {"n_probe": 5, "k_reorder": 10},
+           {"n_probe": 10, "k_reorder": 10},
+           {"n_probe": 50, "k_reorder": 10},
+           {"n_probe": 100, "k_reorder": 10},
+           {"n_probe": 200, "k_reorder": 10},
+           {"n_probe": 1, "k_reorder": 100},
+           {"n_probe": 5, "k_reorder": 100},
+           {"n_probe": 10, "k_reorder": 100},
+           {"n_probe": 50, "k_reorder": 100},
+           {"n_probe": 100, "k_reorder": 100},
+           {"n_probe": 200, "k_reorder": 100},
+           {"n_probe": 1, "k_reorder": 1000},
+           {"n_probe": 5, "k_reorder": 1000},
+           {"n_probe": 10, "k_reorder": 1000},
+           {"n_probe": 50, "k_reorder": 1000},
+           {"n_probe": 100, "k_reorder": 1000},
+           {"n_probe": 200, "k_reorder": 1000}
+          ]
+  faiss-ivf:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ['@metric']
+    constructor: FaissIVF
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 10000}]
+        query-args: |
+          [{"n_probe": 10},
+           {"n_probe": 15},
+           {"n_probe": 20}, 
+           {"n_probe": 40},
+           {"n_probe": 60},
+           {"n_probe": 80},
+           {"n_probe": 100},
+           {"n_probe": 120}, 
+           {"n_probe": 140},
+           {"n_probe": 160},
+           {"n_probe": 180},
+           {"n_probe": 200}
+          ]
+
+
+deep-10M:
+  faiss-ivfpqfs:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ["@metric"]
+    constructor: FaissIVFPQfs
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 10000}]
+
+        query-args: |
+          [{"n_probe": 1, "k_reorder": 0},
+           {"n_probe": 5, "k_reorder": 0},
+           {"n_probe": 10, "k_reorder": 0},
+           {"n_probe": 50, "k_reorder": 0},
+           {"n_probe": 100, "k_reorder": 0},
+           {"n_probe": 200, "k_reorder": 0},
+           {"n_probe": 1, "k_reorder": 10},
+           {"n_probe": 5, "k_reorder": 10},
+           {"n_probe": 10, "k_reorder": 10},
+           {"n_probe": 50, "k_reorder": 10},
+           {"n_probe": 100, "k_reorder": 10},
+           {"n_probe": 200, "k_reorder": 10},
+           {"n_probe": 1, "k_reorder": 100},
+           {"n_probe": 5, "k_reorder": 100},
+           {"n_probe": 10, "k_reorder": 100},
+           {"n_probe": 50, "k_reorder": 100},
+           {"n_probe": 100, "k_reorder": 100},
+           {"n_probe": 200, "k_reorder": 100},
+           {"n_probe": 1, "k_reorder": 1000},
+           {"n_probe": 5, "k_reorder": 1000},
+           {"n_probe": 10, "k_reorder": 1000},
+           {"n_probe": 50, "k_reorder": 1000},
+           {"n_probe": 100, "k_reorder": 1000},
+           {"n_probe": 200, "k_reorder": 1000}
+          ]
+  faiss-ivf:
+    docker-tag: neurips23-ood-faiss
+    module: neurips23.ood.faiss.faiss
+    base-args: ['angular']
+    constructor: FaissIVF
+    disabled: false
+    run-groups:
+      base:
+        args: |
+          [{"n_list" : 10000}]
+        query-args: |
+          [{"n_probe": 4},
+           {"n_probe": 6},
+           {"n_probe": 8},
+           {"n_probe": 12},
+           {"n_probe": 16},
+           {"n_probe": 20},
+           {"n_probe": 24},
+           {"n_probe": 28},
+           {"n_probe": 32},
+           {"n_probe": 36},
+           {"n_probe": 40}
+          ]

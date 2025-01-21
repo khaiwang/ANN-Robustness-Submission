@@ -54,7 +54,7 @@ class Scann(BaseOODANN):
                 os.rename(src, dst)
             self.searcher = scann.scann_ops_pybind.load_searcher(
                 self.serialized_dir)
-            self.searcher.set_num_threads(64)
+            self.searcher.set_num_threads(32)
         else:
             print("ScaNN: Training from scratch.")
             self.fit(dataset)
@@ -66,11 +66,10 @@ class Scann(BaseOODANN):
         print('ScaNN: Training')
         print('This requires more than 16GB of RAM.')
         print('Please download the serialized searcher or use a higher RAM VM.')
-        ds = DATASETS[dataset]()
         config = f"""
       num_neighbors: 10
       distance_measure {{
-        distance_measure: "SquaredL2Distance"
+        distance_measure: "DotProductDistance"
       }}
       partitioning {{
         num_children: { self.tree_size }
@@ -79,7 +78,7 @@ class Scann(BaseOODANN):
         partitioning_distance {{
           distance_measure: "SquaredL2Distance"
         }}
-        num_cpus: 64
+        num_cpus: 32
         database_spilling {{
           spilling_type: FIXED_NUMBER_OF_CENTERS
           max_spill_centers: 2
@@ -103,9 +102,9 @@ class Scann(BaseOODANN):
         asymmetric_hash {{
           projection {{
             projection_type: CHUNK
-            num_blocks: 50
+            num_blocks: 100
             num_dims_per_block: 2
-            input_dim: 100
+            input_dim: 200
           }}
           num_clusters_per_block: 16
           max_clustering_iterations: 30
@@ -113,7 +112,7 @@ class Scann(BaseOODANN):
             distance_measure: "SquaredL2Distance"
           }}
           lookup_type: INT8_LUT16
-          use_residual_quantization: false
+          use_residual_quantization: true
           noise_shaping_threshold: 0.1
           expected_sample_size: 100000
           use_global_topn: true
@@ -128,9 +127,8 @@ class Scann(BaseOODANN):
       }}
       custom_search_method: "experimental_top_level_partitioner:700,20,3.0,2.5,1.8"
     """
-        print('ScaNN: Config for dataset:', dataset, config)
 
-        
+        ds = DATASETS[dataset]()
         k = ds.default_count()
         self.searcher = (scann.scann_ops_pybind.builder(
             np.zeros([0, ds.d]).astype('float32'), k, 'dot_product')

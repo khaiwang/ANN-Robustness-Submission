@@ -26,7 +26,7 @@ import time
 import math
 import struct
 
-CPU_LIMIT = multiprocessing.cpu_count()
+CPU_LIMIT = min(64, multiprocessing.cpu_count())
 swig_ptr = py_puck_api.swig_ptr
 class Puck(BaseOODANN):
     def __init__(self, metric, index_params):
@@ -182,7 +182,7 @@ class Puck(BaseOODANN):
         print("self.topk=%d"%self.topk)
         py_puck_api.update_gflag('topk', "%s"%(ds.default_count()))
         py_puck_api.update_gflag('index_path', self.index_name(dataset))
-        py_puck_api.update_gflag('context_initial_pool_size', "%d"%(2 * CPU_LIMIT))
+        py_puck_api.update_gflag('context_initial_pool_size', "%d"%(CPU_LIMIT))
         py_puck_api.update_gflag('threads_count', "%d"%(CPU_LIMIT))
         print(self.index_name(dataset))
         ret = self.index.init()
@@ -205,7 +205,8 @@ class Puck(BaseOODANN):
     
     def query(self, X, topK):
         n, d = X.shape
-        
+        X = X.astype(np.float32)
+        print(X.dtype)
         self.index.search(n, swig_ptr(X), topK, swig_ptr(self.res[0]), swig_ptr(self.res[1]))
         #print(self.res[0])
         # print(self.res[1])

@@ -1,3 +1,32 @@
+msmarco-10M:
+    diskann:
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":32, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":85, "T":64},
+             {"Ls":60, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":40, "T":64},
+             {"Ls":15, "T":64},
+             {"Ls":20, "T":64},
+             {"Ls":25, "T":64}]
+        base1:
+          args: |
+            [{"R":16, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":85, "T":64},
+             {"Ls":60, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":40, "T":64},
+             {"Ls":15, "T":64},
+             {"Ls":20, "T":64},
+             {"Ls":25, "T":64}]
 random-xs:
     diskann: 
       docker-tag: neurips23-ood-diskann
@@ -9,7 +38,7 @@ random-xs:
           args: |
             [{"R":32, "L":50, "buildthreads":32}]
           query-args: |
-            [{"Ls":50, "T":8}]
+            [{"Ls":50, "T":64}]
 text2image-1M:
     diskann: 
       docker-tag: neurips23-ood-diskann
@@ -21,10 +50,10 @@ text2image-1M:
           args: |
             [{"R":64, "L":500, "buildthreads":32}]
           query-args: |
-            [{"Ls":30, "T":8},
-             {"Ls":50, "T":8},
-             {"Ls":70, "T":8},
-             {"Ls":100, "T":8}]
+            [{"Ls":30, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":70, "T":64},
+             {"Ls":100, "T":64}]
 text2image-10M:
     diskann: 
       docker-tag: neurips23-ood-diskann
@@ -34,9 +63,61 @@ text2image-10M:
       run-groups:
         base:
           args: |
-            [{"R":64, "L":500, "buildthreads":32}]
+            [{"R":64, "L":500, "buildthreads":64}]
           query-args: |
-            [{"Ls":30, "T":8},
-             {"Ls":50, "T":8},
-             {"Ls":70, "T":8},
-             {"Ls":100, "T":8}]
+            [
+             {"Ls":20, "T":64},
+             {"Ls":30, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":70, "T":64},
+             {"Ls":85, "T":64},
+             {"Ls":100, "T":64},
+             {"Ls":120, "T":64},
+             {"Ls":150, "T":64},
+             {"Ls":200, "T":64}
+            ]
+
+msspacev-10M:
+    diskann:
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":32, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":10, "T":64},
+             {"Ls":20, "T":64},
+             {"Ls":30, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":70, "T":64},
+             {"Ls":80, "T":64},
+             {"Ls":90, "T":64},
+             {"Ls":100, "T":64},
+             {"Ls":120, "T":64},
+             {"Ls":150, "T":64},
+             {"Ls":200, "T":64},
+             {"Ls":250, "T":64}]
+deep-10M:
+    diskann:
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":16, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":64},
+             {"Ls":50, "T":64},
+             {"Ls":70, "T":64},
+             {"Ls":80, "T":64},
+             {"Ls":90, "T":64},
+             {"Ls":100, "T":64},
+             {"Ls":120, "T":64},
+             {"Ls":150, "T":64},
+             {"Ls":200, "T":64},
+             {"Ls":250, "T":64}]

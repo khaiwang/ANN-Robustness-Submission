@@ -10,7 +10,8 @@ random-xs:
           [{"R":32, "L":50}]
         query-args: |
           [{"ef":30}, {"ef":50}, {"ef":100}]
-text2image-10M:
+
+msmarco-10M:
   zilliz:
     docker-tag: neurips23-ood-zilliz
     module: neurips23.ood.zilliz.zilliz
@@ -19,7 +20,7 @@ text2image-10M:
     run-groups:
       base:
         args: |
-          [{"R":48, "L":500, "buildthreads" : 8}]
+          [{"R":48, "L":500, "buildthreads":64}]
         query-args: |
           [
           {"ef":90},
@@ -31,5 +32,101 @@ text2image-10M:
           {"ef":108},
           {"ef":110},
           {"ef":115},
-          {"ef":120}
+          {"ef":120},
+          {"ef":150},
+          {"ef":180},
+          {"ef":200},
+          {"ef":70},
+          {"ef":60},
+          {"ef":50},
+          {"ef":40},
+          {"ef":30},
+          {"ef":20}
           ]
+
+
+text2image-10M:
+  zilliz:
+    docker-tag: neurips23-ood-zilliz
+    module: neurips23.ood.zilliz.zilliz
+    constructor: Zilliz
+    base-args: ["@metric"]
+    run-groups:
+      base:
+        args: |
+          [{"R":48, "L":500, "buildthreads":64}]
+        query-args: |
+          [
+          {"ef":90},
+          {"ef":95},
+          {"ef":100},
+          {"ef":102},
+          {"ef":104},
+          {"ef":106},
+          {"ef":108},
+          {"ef":110},
+          {"ef":115},
+          {"ef":120},
+          {"ef":150},
+          {"ef":180},
+          {"ef":200},
+          {"ef":70},
+          {"ef":60},
+          {"ef":50},
+          {"ef":40},
+          {"ef":30},
+          {"ef":20}
+          ]
+msspacev-10M:
+  zilliz:
+    docker-tag: neurips23-ood-zilliz
+    module: neurips23.ood.zilliz.zilliz
+    constructor: Zilliz
+    base-args: ["@metric"]
+    run-groups:
+      base:
+        args: |
+          [{"R":32, "L":500, "buildthreads":64}]
+        query-args: |
+          [
+          {"ef":90},
+          {"ef":80},
+          {"ef":100},
+          {"ef":70},
+          {"ef":60},
+          {"ef":50},
+          {"ef":40},
+          {"ef":30},
+          {"ef":20},
+          {"ef":10}
+          ]
+
+deep-10M:
+  zilliz:
+    docker-tag: neurips23-ood-zilliz
+    module: neurips23.ood.zilliz.zilliz
+    constructor: Zilliz
+    base-args: ["@metric"]
+    run-groups:
+      base:
+        args: |
+          [{"R":32, "L":300, "buildthreads":64}]
+        query-args: |
+          [
+          {"ef":80},
+          {"ef":75},
+          {"ef":70},
+          {"ef":65},
+          {"ef":60},
+          {"ef":55},
+          {"ef":50},
+          {"ef":45},
+          {"ef":40},
+          {"ef":35},
+          {"ef":30},
+          {"ef":25},
+          {"ef":20},
+          {"ef":15},
+          {"ef":10}
+          ]
+

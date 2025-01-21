@@ -23,12 +23,135 @@ text2image-10M:
       base-args: ["@metric"]
       run-groups:
         base:
-          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200}]
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":4}]
           query-args: |
                 [
                   {"search_coarse_count":10, "tinker_search_range": 190},
                   {"search_coarse_count":10, "tinker_search_range": 160},
                   {"search_coarse_count":10, "tinker_search_range": 165},
                   {"search_coarse_count":10, "tinker_search_range": 170},
-                  {"search_coarse_count":10, "tinker_search_range": 175}
-                ] 
+                  {"search_coarse_count":10, "tinker_search_range": 175},
+                  {"search_coarse_count":10, "tinker_search_range": 120},
+                  {"search_coarse_count":10, "tinker_search_range": 110},
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 350},
+                  {"search_coarse_count":10, "tinker_search_range": 300},
+                  {"search_coarse_count":10, "tinker_search_range": 200},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30}                    
+                ]
+    puck-nopq:
+      docker-tag: neurips23-ood-puck
+      module: neurips23.ood.puck.puck
+      constructor: Puck
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":1}]
+          query-args: |
+                [
+                  {"search_coarse_count":10, "tinker_search_range": 190},
+                  {"search_coarse_count":10, "tinker_search_range": 160},
+                  {"search_coarse_count":10, "tinker_search_range": 165},
+                  {"search_coarse_count":10, "tinker_search_range": 170},
+                  {"search_coarse_count":10, "tinker_search_range": 175},
+                  {"search_coarse_count":10, "tinker_search_range": 120},
+                  {"search_coarse_count":10, "tinker_search_range": 110},
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 350},
+                  {"search_coarse_count":10, "tinker_search_range": 300},
+                  {"search_coarse_count":10, "tinker_search_range": 200},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30}
+                ]
+
+
+msspacev-10M:
+    puck:
+      docker-tag: neurips23-ood-puck
+      module: neurips23.ood.puck.puck
+      constructor: Puck
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":4}]
+          query-args: |
+                [
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 90},
+                  {"search_coarse_count":10, "tinker_search_range": 80},
+                  {"search_coarse_count":10, "tinker_search_range": 60},
+                  {"search_coarse_count":10, "tinker_search_range": 70},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30},
+                  {"search_coarse_count":10, "tinker_search_range": 10},
+                  {"search_coarse_count":10, "tinker_search_range": 20}
+                ]
+    puck-nopq:
+      docker-tag: neurips23-ood-puck
+      module: neurips23.ood.puck.puck
+      constructor: Puck
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":1}]
+          query-args: |
+                [
+                  {"search_coarse_count":10, "tinker_search_range": 190},
+                  {"search_coarse_count":10, "tinker_search_range": 160},
+                  {"search_coarse_count":10, "tinker_search_range": 165},
+                  {"search_coarse_count":10, "tinker_search_range": 170},
+                  {"search_coarse_count":10, "tinker_search_range": 175},
+                  {"search_coarse_count":10, "tinker_search_range": 120},
+                  {"search_coarse_count":10, "tinker_search_range": 110},
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 200},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30},
+                  {"search_coarse_count":10, "tinker_search_range": 15}
+                ]
+
+deep-10M:
+    puck:
+      docker-tag: neurips23-ood-puck
+      module: neurips23.ood.puck.puck
+      constructor: Puck
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":4}]
+          query-args: |
+                [
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 90},
+                  {"search_coarse_count":10, "tinker_search_range": 80},
+                  {"search_coarse_count":10, "tinker_search_range": 60},
+                  {"search_coarse_count":10, "tinker_search_range": 70},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30},
+                  {"search_coarse_count":10, "tinker_search_range": 15},
+                  {"search_coarse_count":10, "tinker_search_range": 20}
+                ]
+    puck-nopq:
+      docker-tag: neurips23-ood-puck
+      module: neurips23.ood.puck.puck
+      constructor: Puck
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: [{"index_type":2, "C":1000, "F":1000,"tinker_neighborhood":16,"tinker_construction":200, "N":1}]
+          query-args: |
+                [
+                  {"search_coarse_count":10, "tinker_search_range": 190},
+                  {"search_coarse_count":10, "tinker_search_range": 160},
+                  {"search_coarse_count":10, "tinker_search_range": 165},
+                  {"search_coarse_count":10, "tinker_search_range": 170},
+                  {"search_coarse_count":10, "tinker_search_range": 175},
+                  {"search_coarse_count":10, "tinker_search_range": 120},
+                  {"search_coarse_count":10, "tinker_search_range": 110},
+                  {"search_coarse_count":10, "tinker_search_range": 100},
+                  {"search_coarse_count":10, "tinker_search_range": 200},
+                  {"search_coarse_count":10, "tinker_search_range": 50},
+                  {"search_coarse_count":10, "tinker_search_range": 30},
+                  {"search_coarse_count":10, "tinker_search_range": 15}
+                ]

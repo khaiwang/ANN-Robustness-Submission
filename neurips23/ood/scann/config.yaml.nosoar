@@ -1,0 +1,31 @@
+text2image-10M:
+    scann-nosoar:
+      docker-tag: neurips23-ood-scann
+      module: neurips23.ood.scann.scann
+      constructor: Scann
+      base-args: ["@metric"]
+      run-groups:
+        tree40k:
+          args: |
+            [{"tree_size": 40000, "download": false}]
+          query-args: |
+            [{"leaves_to_search": 10, "reorder": 150},
+             {"leaves_to_search": 30, "reorder": 150},
+             {"leaves_to_search": 33, "reorder": 150},
+             {"leaves_to_search": 35, "reorder": 150}, 
+             {"leaves_to_search": 40, "reorder": 150}, 
+             {"leaves_to_search": 45, "reorder": 150},
+             {"leaves_to_search": 50, "reorder": 150},
+             {"leaves_to_search": 80, "reorder": 150},
+             {"leaves_to_search": 100, "reorder": 150}, 
+             {"leaves_to_search": 35, "reorder": 30},
+             {"leaves_to_search": 35, "reorder": 50},
+             {"leaves_to_search": 35, "reorder": 80},
+             {"leaves_to_search": 35, "reorder": 130},
+             {"leaves_to_search": 35, "reorder": 140},
+             {"leaves_to_search": 35, "reorder": 160},
+             {"leaves_to_search": 35, "reorder": 200},
+             {"leaves_to_search": 10, "reorder": 30},
+             {"leaves_to_search": 10, "reorder": 130},
+             {"leaves_to_search": 10, "reorder": 180},
+             {"leaves_to_search": 10, "reorder": 60}]

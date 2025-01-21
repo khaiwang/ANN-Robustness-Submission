@@ -101,7 +101,7 @@ class diskann(BaseOODANN):
             vector_dtype = self.translate_dtype(ds.dtype),
             index_directory = index_dir,
             index_prefix = self.index_name(),
-            num_threads = 64, #to allocate scratch space for up to 64 search threads
+            num_threads = 32, #to allocate scratch space for up to 64 search threads
             initial_search_complexity = 100
         )
         print('Index ready for search')
@@ -150,7 +150,7 @@ class diskann(BaseOODANN):
             vector_dtype = self.translate_dtype(ds.dtype),
             index_directory = index_dir,
             index_prefix = self.index_name(),
-            num_threads = 64, #to allocate scratch space for up to 64 search threads
+            num_threads = 32, #to allocate scratch space for up to 64 search threads
             initial_search_complexity = 100
         )
         print ("Load index success.")

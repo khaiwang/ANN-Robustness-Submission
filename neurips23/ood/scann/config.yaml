@@ -1,3 +1,58 @@
+msmarco-10M:
+    scann:
+      docker-tag: neurips23-ood-scann
+      module: neurips23.ood.scann.scann
+      constructor: Scann
+      base-args: ["@metric"]
+      run-groups:
+        tree400:
+          args: |
+            [{"tree_size": 40000, "download": false}]
+          query-args: |
+            [{"leaves_to_search": 40, "reorder": 150},
+             {"leaves_to_search": 50, "reorder": 150},
+             {"leaves_to_search": 60, "reorder": 150},
+             {"leaves_to_search": 70, "reorder": 150},
+             {"leaves_to_search": 75, "reorder": 150},
+             {"leaves_to_search": 80, "reorder": 150},
+             {"leaves_to_search": 85, "reorder": 150},
+             {"leaves_to_search": 90, "reorder": 150},
+             {"leaves_to_search": 35, "reorder": 150},
+             {"leaves_to_search": 30, "reorder": 150},
+             {"leaves_to_search": 20, "reorder": 150},
+             {"leaves_to_search": 10, "reorder": 150},
+             {"leaves_to_search": 15, "reorder": 150}]
+
+# text2image-10M:
+#     scann:
+#       docker-tag: neurips23-ood-scann
+#       module: neurips23.ood.scann.scann
+#       constructor: Scann
+#       base-args: ["@metric"]
+#       run-groups:
+#         tree40k-config0:
+#           args: |
+#             [{"tree_size": 40000, "download": true, "config_id": 0}]
+#           query-args: |
+#             [{"leaves_to_search": 10, "reorder": 150},
+#              {"leaves_to_search": 30, "reorder": 150},
+#              {"leaves_to_search": 33, "reorder": 150},
+#              {"leaves_to_search": 35, "reorder": 150},
+#              {"leaves_to_search": 40, "reorder": 150},
+#              {"leaves_to_search": 45, "reorder": 150},
+#              {"leaves_to_search": 50, "reorder": 150},
+#              {"leaves_to_search": 80, "reorder": 150},
+#              {"leaves_to_search": 100, "reorder": 150},
+#              {"leaves_to_search": 10, "reorder": 30},
+#              {"leaves_to_search": 30, "reorder": 30},
+#              {"leaves_to_search": 33, "reorder": 30},
+#              {"leaves_to_search": 35, "reorder": 30},
+#              {"leaves_to_search": 40, "reorder": 30},
+#              {"leaves_to_search": 45, "reorder": 30},
+#              {"leaves_to_search": 50, "reorder": 30},
+#              {"leaves_to_search": 80, "reorder": 30},
+#              {"leaves_to_search": 100, "reorder": 30}]
+
 text2image-10M:
     scann:
       docker-tag: neurips23-ood-scann
@@ -9,19 +64,99 @@ text2image-10M:
           args: |
             [{"tree_size": 40000, "download": true, "config_id": 0}]
           query-args: |
-            [{"leaves_to_search": 35, "reorder": 150},
-             {"leaves_to_search": 35, "reorder": 155},
-             {"leaves_to_search": 36, "reorder": 150},
-             {"leaves_to_search": 37, "reorder": 145},
-             {"leaves_to_search": 38, "reorder": 140},
-             {"leaves_to_search": 34, "reorder": 155}]
-        tree40k-config1:
+            [
+             {"leaves_to_search": 1, "reorder": 150},
+             {"leaves_to_search": 2, "reorder": 150},
+             {"leaves_to_search": 4, "reorder": 150},
+             {"leaves_to_search": 6, "reorder": 150},
+             {"leaves_to_search": 8, "reorder": 150},
+             {"leaves_to_search": 10, "reorder": 150},
+             {"leaves_to_search": 30, "reorder": 150},
+             {"leaves_to_search": 33, "reorder": 150},
+             {"leaves_to_search": 35, "reorder": 150},
+             {"leaves_to_search": 40, "reorder": 150},
+             {"leaves_to_search": 45, "reorder": 150},
+             {"leaves_to_search": 50, "reorder": 150},
+             {"leaves_to_search": 80, "reorder": 150},
+             {"leaves_to_search": 100, "reorder": 150}]
+
+msspacev-10M:
+    scann:
+      docker-tag: neurips23-ood-scann
+      module: neurips23.ood.scann.scann
+      constructor: Scann
+      base-args: ["@metric"]
+      run-groups:
+        tree40k:
           args: |
-            [{"tree_size": 40000, "download": true, "config_id": 1}]
+            [{"tree_size": 40000}]
           query-args: |
-            [{"leaves_to_search": 42, "reorder": 160}]
-        tree40k-config2:
+            [{"leaves_to_search": 10, "reorder": 150},
+             {"leaves_to_search": 20, "reorder": 150},
+             {"leaves_to_search": 30, "reorder": 150},
+             {"leaves_to_search": 35, "reorder": 150},
+             {"leaves_to_search": 40, "reorder": 150},
+             {"leaves_to_search": 45, "reorder": 150},
+             {"leaves_to_search": 50, "reorder": 150},
+             {"leaves_to_search": 80, "reorder": 150},
+             {"leaves_to_search": 100, "reorder": 150},
+             {"leaves_to_search": 120, "reorder": 150},
+             {"leaves_to_search": 150, "reorder": 150},
+             {"leaves_to_search": 10, "reorder": 30},
+             {"leaves_to_search": 20, "reorder": 30},
+             {"leaves_to_search": 30, "reorder": 30},
+             {"leaves_to_search": 35, "reorder": 30},
+             {"leaves_to_search": 40, "reorder": 30},
+             {"leaves_to_search": 45, "reorder": 30},
+             {"leaves_to_search": 50, "reorder": 30},
+             {"leaves_to_search": 80, "reorder": 30},
+             {"leaves_to_search": 100, "reorder": 30},
+             {"leaves_to_search": 120, "reorder": 30},
+             {"leaves_to_search": 150, "reorder": 30},
+             {"leaves_to_search": 10, "reorder": 10},
+             {"leaves_to_search": 20, "reorder": 10},
+             {"leaves_to_search": 30, "reorder": 10},
+             {"leaves_to_search": 35, "reorder": 10},
+             {"leaves_to_search": 40, "reorder": 10},
+             {"leaves_to_search": 45, "reorder": 10},
+             {"leaves_to_search": 50, "reorder": 10},
+             {"leaves_to_search": 80, "reorder": 10},
+             {"leaves_to_search": 100, "reorder": 10},
+             {"leaves_to_search": 120, "reorder": 10},
+             {"leaves_to_search": 150, "reorder": 10}]
+
+deep-10M:
+    scann:
+      docker-tag: neurips23-ood-scann
+      module: neurips23.ood.scann.scann
+      constructor: Scann
+      base-args: ["@metric"]
+      run-groups:
+        tree40k:
           args: |
-            [{"tree_size": 40000, "download": true, "config_id": 2}]
+            [{"tree_size": 40000}]
           query-args: |
-            [{"leaves_to_search": 27, "reorder": 140}]
+            [{"leaves_to_search": 10, "reorder": 150},
+             {"leaves_to_search": 20, "reorder": 150},
+             {"leaves_to_search": 30, "reorder": 150},
+             {"leaves_to_search": 35, "reorder": 150},
+             {"leaves_to_search": 40, "reorder": 150},
+             {"leaves_to_search": 45, "reorder": 150},
+             {"leaves_to_search": 50, "reorder": 150},
+             {"leaves_to_search": 80, "reorder": 150},
+             {"leaves_to_search": 100, "reorder": 150},
+             {"leaves_to_search": 120, "reorder": 150},
+             {"leaves_to_search": 150, "reorder": 150},
+             {"leaves_to_search": 180, "reorder": 150},
+             {"leaves_to_search": 10, "reorder": 50},
+             {"leaves_to_search": 20, "reorder": 50},
+             {"leaves_to_search": 30, "reorder": 50},
+             {"leaves_to_search": 35, "reorder": 50},
+             {"leaves_to_search": 40, "reorder": 50},
+             {"leaves_to_search": 45, "reorder": 50},
+             {"leaves_to_search": 50, "reorder": 50},
+             {"leaves_to_search": 80, "reorder": 50},
+             {"leaves_to_search": 100, "reorder": 50},
+             {"leaves_to_search": 120, "reorder": 50},
+             {"leaves_to_search": 150, "reorder": 50},
+             {"leaves_to_search": 180, "reorder": 50}]

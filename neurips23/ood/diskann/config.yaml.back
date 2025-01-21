@@ -1,0 +1,145 @@
+random-xs:
+    diskann: 
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":32, "L":50, "buildthreads":32}]
+          query-args: |
+            [{"Ls":50, "T":32}]
+text2image-1M:
+    diskann: 
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":64, "L":500, "buildthreads":32}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":100, "T":32}]
+text2image-10M:
+    diskann: 
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":64, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":10, "T":32},
+             {"Ls":20, "T":32},
+             {"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":85, "T":32},
+             {"Ls":100, "T":32},
+             {"Ls":120, "T":32},
+             {"Ls":150, "T":32},
+             {"Ls":200, "T":32},
+             {"Ls":250, "T":32},
+             {"Ls":300, "T":32},
+             {"Ls":350, "T":32},
+             {"Ls":400, "T":32}]
+        base-1:
+          args: |
+            [{"R":64, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":100, "T":32}]
+        base-2:
+          args: |
+            [{"R":128, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":100, "T":32}]
+
+msspacev-10M:
+    diskann:
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":64, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":8,  "T":32},
+             {"Ls":10, "T":32},
+             {"Ls":20, "T":32},
+             {"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":85, "T":32},
+             {"Ls":100, "T":32},
+             {"Ls":120, "T":32},
+             {"Ls":150, "T":32},
+             {"Ls":200, "T":32}]
+        base-1:
+          args: |
+            [{"R":64, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":100, "T":32}]
+        base-2:
+          args: |
+            [{"R":128, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":70, "T":32},
+             {"Ls":100, "T":32}]
+deep-10M:
+    diskann:
+      docker-tag: neurips23-ood-diskann
+      module: neurips23.ood.diskann.diskann-in-mem
+      constructor: diskann
+      base-args: ["@metric"]
+      run-groups:
+        base:
+          args: |
+            [{"R":64, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":8,  "T":32},
+             {"Ls":10, "T":32},
+             {"Ls":20, "T":32},
+             {"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":25, "T":32},
+             {"Ls":35, "T":32},
+             {"Ls":45, "T":32},
+             {"Ls":55, "T":32},
+             {"Ls":22, "T":32},
+             {"Ls":15, "T":32}]
+        base-1:
+          args: |
+            [{"R":64, "L":300, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":20, "T":32},
+             {"Ls":40, "T":32}]
+        base-2:
+          args: |
+            [{"R":128, "L":500, "buildthreads":64}]
+          query-args: |
+            [{"Ls":30, "T":32},
+             {"Ls":50, "T":32},
+             {"Ls":20, "T":32},
+             {"Ls":40, "T":32}]
