@@ -5,6 +5,9 @@ import operator
 import random
 import sys
 import copy
+import fnmatch
+
+from collections import defaultdict
 
 from benchmark.plotting.eval_range_search import compute_AP
 from benchmark.sensors.power_capture import power_capture
@@ -110,12 +113,133 @@ def mean_ssd_ios(attrs):
 def mean_latency(attrs):
     return attrs.get("mean_latency", 0)
 
-all_metrics = {
+def cdf(dataset_distances, run_distances, count, metrics):
+    cdf = np.zeros(11)
+    if "knn" not in metrics:
+        print("Computing knn metrics")
+        knn_metrics = metrics.create_group("knn")
+        mean, std, recalls, queries_with_ties = get_recall_values(dataset_distances, run_distances, count)
+        if queries_with_ties>0:
+            print("Warning: %d/%d queries contained ties accounted for in recall" % (queries_with_ties, len(run_distances)))
+        knn_metrics.attrs["mean"] = mean
+        knn_metrics.attrs["std"] = std
+        knn_metrics["recalls"] = recalls
+    else:
+        print("Found cached knn result")
+    if "cdf" not in metrics["knn"]:
+        print("Computing cdf metrics")
+        knn_metrics = metrics["knn"]
+        # recall_values = round_to_nearest_tenth(np.array(knn_metrics["recalls"]))
+         # num_bins = 11
+        bins = np.arange(-0.05, 1.15, 0.1)
+        print(knn_metrics["recalls"])
+        counts, bins = np.histogram(np.array(knn_metrics["recalls"])/count, bins=bins)
+        cdf = np.cumsum(counts)
+        print(cdf)
+        cdf = cdf / cdf[-1]
+        # we want to calculate >=, so we add 0 to the start of the cdf and remove the last one
+        cdf = np.insert(cdf, 0, 0)
+        cdf = cdf[:-1]
+        knn_metrics["cdf"] = cdf
+        print(knn_metrics["cdf"])
+    else:
+        knn_metrics = metrics["knn"]
+        cdf = np.array(knn_metrics["cdf"])
+        print(cdf)
+        print("Found cached cdf result")
+    return cdf
+
+def robustness(dataset_distances, run_distances, count, metrics, robust_threshold):
+    """
+    Compute robustness metric: frequency of queries achieving recall >= threshold.
+    
+    Args:
+        robust_threshold: Recall threshold (0-1) for robustness calculation
+        count: Number of nearest neighbors (k) for the query
+    
+    Returns:
+        Robustness value: proportion of queries that achieve the target recall
+    """
+    # name robustness: robustness-x@k where x is threshold and k is count
+    s = f"robustness-{robust_threshold}@{count}"
+    delta = robust_threshold
+    print("delta", delta)
+    if "knn" not in metrics:
+        print("Computing knn metrics")
+        knn_metrics = metrics.create_group("knn")
+        mean, std, recalls, queries_with_ties = get_recall_values(dataset_distances, run_distances, count)
+        if queries_with_ties>0:
+            print("Warning: %d/%d queries contained ties accounted for in recall" % (queries_with_ties, len(run_distances)))
+        knn_metrics.attrs["mean"] = mean
+        knn_metrics.attrs["std"] = std
+        knn_metrics["recalls"] = recalls
+    else:
+        print("Found cached recall result")
+    if s not in metrics["knn"]:        
+        print("Computing robustness metrics", s)
+        metrics["knn"].attrs[s] = np.sum(np.array(metrics["knn"]["recalls"]) >= delta * count) / len(metrics["knn"]["recalls"])
+    else:
+        print("Found cached robustness result", s)
+    return metrics["knn"].attrs[s]
+
+def robustness_metric(key):
+    if key.startswith("robustness"):
+        print("key", key)
+        # robustness-x@k (new format) where x is threshold and k is count
+        
+        threshold = None
+        
+        if "-" in key:
+            # Format: robustness-x
+            parts = key.split("-")
+            threshold = float(parts[1])
+        else:
+            raise ValueError(f"Could not parse robustness metric key: {key}, format should be robustness-x, x ranges from 0 to 1")
+        
+        if threshold is None:
+            raise ValueError(f"Could not parse robustness metric key: {key}")
+        
+        description = f"Frequency of queries with Recall > {threshold} (Recall-{threshold})"
+        
+        return {
+            "description": description,
+            "function": lambda true_distances, run_distances, metrics, run_attrs: robustness(
+                true_distances, run_distances, run_attrs["count"], metrics, threshold
+            ),
+            # noqa
+            "worst": float("-inf"),
+            "best": float("inf"),
+            "lim": [0.0, 1.00],
+        }
+    raise ValueError(f"Unknown metric {key}")
+
+class KeyAwareDefaultDict(defaultdict):
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        else:
+            return robustness_metric(key)
+
+
+all_metrics = KeyAwareDefaultDict(robustness_metric, {
     "k-nn": {
         "description": "Recall",
         "function": lambda true_nn, run_nn, metrics, run_attrs: knn(true_nn, run_nn, run_attrs["count"], metrics).attrs['mean'],  # noqa
         "worst": float("-inf"),
         "lim": [0.0, 1.03],
+    },
+    "robustness*": {
+        # keep this empty for keys() to find it
+        # avoid using this key directly
+    },
+    "cdf": {
+        "description": "CDF",
+        "function": lambda true_distances, run_distances, metrics, run_attrs: cdf(
+            true_distances, run_distances, run_attrs["count"], metrics
+        ),
+        "worst": float("-inf"),
+        "best": float("inf"),
+        "lim": [0.0, 1.00],
     },
     "ap": {
         "description": "Average Precision",
@@ -170,4 +294,5 @@ all_metrics = {
         "worst": float("inf")
     },
 
-}
+})
+
