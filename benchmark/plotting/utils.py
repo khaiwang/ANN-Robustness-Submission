@@ -17,6 +17,35 @@ def get_or_create_metrics(run):
         run.create_group('metrics')
     return run['metrics']
 
+def find_configuration_with_fixed_recall(data, xm, ym, recall):
+    rev_y = -1 if ym["worst"] < 0 else 1
+    rev_x = -1 if xm["worst"] < 0 else 1
+    data.sort(key=lambda t: (rev_x * t[-2], rev_y * t[-1]))
+    # search for the configuration with the least recall rate that is still above the fixed recall
+    last_d = 0
+    for idx, (algo, algo_name, xv, yv) in enumerate(data):
+        if xv >= recall:
+            last_d = idx
+            continue
+        if xv < recall:
+            print("Found configuration with recall rate above the fixed recall rate")
+            print("Current: ", xv)
+            break
+    return data[last_d]
+
+# Use a filter metric to filter out configurations that are not in the desired range
+# This is used for the 3-way tradeoff plots
+def find_configuration_with_fixed_range(data, xm, ym, min, max):
+    # fix the range of x
+    rev_y = -1 if ym["worst"] < 0 else 1
+    rev_x = -1 if xm["worst"] < 0 else 1
+    data.sort(key=lambda t: (rev_x * t[-2], rev_y * t[-1]))
+    selected = []
+    for idx, (algo, algo_name, xv, yv) in enumerate(data):
+        if xv >= float(min) and xv <= float(max):
+            selected.append((algo, algo_name, xv, yv))
+    print("found %d configurations for %s"% (len(selected), data[0][0]))
+    return selected
 
 def create_pointset(data, xn, yn):
     xm, ym = (metrics[xn], metrics[yn])
@@ -27,9 +56,15 @@ def create_pointset(data, xn, yn):
     axs, ays, als = [], [], []
     # Generate Pareto frontier
     xs, ys, ls = [], [], []
+    # last_x = xm["worst"]
+    # comparator = ((lambda xv, lx: xv > lx)
+    #               if last_x < 0 else (lambda xv, lx: xv < lx))
     last_x = xm["worst"]
     comparator = ((lambda xv, lx: xv > lx)
-                  if last_x < 0 else (lambda xv, lx: xv < lx))
+                    if last_x < 0 else (lambda xv, lx: xv < lx))
+    if (xn == "k-nn" and yn.startswith("robustness")) or (yn == "k-nn" and xn.startswith("robustness")):
+        # for robustness-recall, its not a tradeoff, so we cannot have a pareto frontier, just keep all the data
+        comparator = lambda xv, lx: True
     for algo, algo_name, xv, yv in data:
         if not xv or not yv:
             continue
@@ -43,6 +78,33 @@ def create_pointset(data, xn, yn):
             ls.append(algo_name)
     return xs, ys, ls, axs, ays, als
 
+def compute_cdf_to_robustness_values(true_nn, res, metric_1, metric_2, recompute=False):
+    all_results = {}
+    for i, (properties, run) in enumerate(res):
+        algo = properties["algo"]
+        algo_name = properties["name"]
+        if metric_1 == "ap"  or metric_2 == "ap":
+            run_nn = (numpy.array(run['lims']),
+                    numpy.array(run['neighbors']),
+                    numpy.array(run['distances']))
+        else:
+            run_nn = numpy.array(run['neighbors'])
+        # times = numpy.array(run["times"])
+        if recompute and "metrics" in run:
+            del run["metrics"]
+        metrics_cache = get_or_create_metrics(run)
+
+        cdf_value = metrics["cdf"]["function"](
+            true_nn, run_nn, metrics_cache, properties
+        )
+
+        print("%3d: %80s" % (i, algo_name))
+        print("CDF: ", end = "")
+        print(1 - numpy.array(cdf_value))
+        all_results.setdefault(algo, []).append((algo, algo_name, numpy.arange(0, 1.1, 0.1), 1 - cdf_value))
+    # print(all_results)
+    # print("ALL CDF Results:", all_results)
+    return all_results
 
 def compute_metrics(true_nn, res, metric_1, metric_2,
                     recompute=False):

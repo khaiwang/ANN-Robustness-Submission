@@ -20,7 +20,7 @@ from .dataset_io import (
 )
 
 
-BASEDIR = "data/"
+BASEDIR = "../big-ann-benchmarks/data/"
 
 
 class Dataset():
@@ -425,6 +425,19 @@ class MSTuringANNS(BillionScaleDatasetCompetitionFormat):
 
     def distance(self):
         return "euclidean"
+
+    def distance(self):
+        return "ip"
+
+    def search_type(self):
+        return "knn"
+
+    def __str__(self):
+        return f"MSMARCO10M({self.nb})"
+
+    def default_count(self):
+        return 10
+
 
 class MSTuringClustered10M(DatasetCompetitionFormat):
     def __init__(self):
