@@ -4,7 +4,7 @@ Assessments.
 We extend the Big-ANN-Benchmarks:
 ## Robustness Metric
 #### Robustness@$\delta$ metric support
-By assigning the `x-axis` or `y-axis` to the `robustness@$\delta$`($\delta$ is a customized threshold to show the number of queries with recall $\ge\ \delta$) metric, we can plot the robustness metric with a fixed average recall.
+By assigning the `x-axis` or `y-axis` to the `robustness@`$\delta$. $\delta$ is a customized threshold to show the number of queries with recall $\ge\ \delta$) metric, we can plot the robustness metric with a fixed average recall.
 #### Benchmark dockers according to the paper setup.
 We adopted the neurips23track ood setup to run our evaluation, as it is the latest setup and contains up-to-date datasets and algorithms.
 * Install the requirements in the requirements_py3.10.txt
