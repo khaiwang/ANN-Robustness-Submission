@@ -25,9 +25,10 @@ Use `--fix-recall` to denote the fixed average recall for the robustness plot.
 4. RAG with the embedded corpus and ANN results. 
 Note that the current workflow is not automated, should manually run the vector search and use the results to run RAG.
 5. RAG Evaluation
-===
+
+---
 Below is the original Big-ANN-Benchmarks README contents
-===
+---
 
 
 # Big ANN Benchmarks
