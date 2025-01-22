@@ -1,0 +1,6 @@
+# Vector Index RAG Evaluation
+This directory is for the RAG evaluation based on vector index search results.
+We use MSMARCO dataset for the evaluation.
+The evaluation code is adopted from [RGB](https://github.com/chen700564/RGB) project
+
+See evaluate.sh for the evaluation script.

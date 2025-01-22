@@ -360,7 +360,48 @@ class Deep1BDataset(BillionScaleDatasetCompetitionFormat):
     def distance(self):
         return "euclidean"
 
+class MSMARCO10MDataset(DatasetCompetitionFormat):
+    def __init__(self, nb = 8841823):
+        self.nb = nb
+        self.d = 768
+        self.nq = 6980
+        self.dtype = "float32"
+        self.ds_fn = "base.fbin"
+        self.qs_fn = "queries.fbin"
+        self.gt_fn = "gt.bin"
+        self.base_url = None
+        self.basedir = os.path.join(BASEDIR, "msmarco")
+        if not os.path.exists(self.basedir):
+            os.makedirs(self.basedir)
 
+    def prepare(self, skip_data=False):
+        import numpy as np
+        queries = np.load(os.path.join(self.basedir, "query_embeddings.npy"))
+        batch = 1000000
+        # initialize the base np array
+        base = np.zeros((self.nb, self.d), dtype=np.float32)
+        for i in range(0, self.nb, batch):
+            base[i:i+batch] = np.load(os.path.join(self.basedir, f"corpus_embeddings_{i}.npy"))
+        # load queries into query numpy array
+        # write queries and base to file
+        with open(os.path.join(self.basedir, self.ds_fn), "wb") as f:
+            np.array([self.nb, self.d], dtype='uint32').tofile(f)
+            base.astype('float32').tofile(f)
+        with open(os.path.join(self.basedir, self.qs_fn), "wb") as f:
+            np.array([self.nq, self.d], dtype='uint32').tofile(f)
+            queries.astype('float32').tofile(f)
+
+    def distance(self):
+        return "ip"
+
+    def search_type(self):
+        return "knn"
+
+    def __str__(self):
+        return f"MSMARCO10M({self.nb})"
+
+    def default_count(self):
+        return 10
 
 class Text2Image1B(BillionScaleDatasetCompetitionFormat):
     def __init__(self, nb_M=1000):
