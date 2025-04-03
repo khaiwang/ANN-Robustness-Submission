@@ -72,7 +72,7 @@ class Scann(BaseOODANN):
         config = f"""
       num_neighbors: 10
       distance_measure {{
-        distance_measure: {self.metric}
+        distance_measure: "{self.metric}"
       }}
       partitioning {{
         num_children: { self.tree_size }
