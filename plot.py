@@ -310,6 +310,7 @@ if __name__ == "__main__":
      
     parser.add_argument("--min", help="Minimum value for fixed metric", default=0)
     parser.add_argument("--max", help="Maximum value for fixed metric", default=float('inf'))
+    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit")
     args = parser.parse_args()
 
     if not args.output:

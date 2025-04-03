@@ -1,5 +1,5 @@
 # ANN Robustness
-This is the codebase of our SIGMOD'26 submission: Towards Robustness: A Critique of Current Vector Database
+This is the codebase of our VLDB'26 submission: Towards Robustness: A Critique of Current Vector Database
 Assessments.
 We extend the Big-ANN-Benchmarks:
 ## Robustness Metric
@@ -27,7 +27,7 @@ Note that the current workflow is not automated, should manually run the vector 
 5. RAG Evaluation
 
 ---
-Below is the original Big-ANN-Benchmarks README contents
+Below is the original Big-ANN-Benchmarks README contents, the corresponding environment is in the `requirements_py3.10.txt` file. 
 ---
 
 

@@ -54,7 +54,7 @@ def main():
     parser.add_argument("--run", type=str, required=True, 
                         choices=["plot", "install", "run"],
                         help="Specify the mode, options are plot, install, run.")
-    parser.add_argument("--count", type=int, required=False, help="Specify the number of runs.", default=10)
+    parser.add_argument("--count", type=int, required=False, help="Specify the number of topk.", default=10)
     args = parser.parse_args()
     if args.run == "plot":
         commands = generate_plot_commands(args.dataset, args.count)

@@ -20,7 +20,6 @@ from .dataset_io import (
 )
 
 
-# BASEDIR = "../big-ann-benchmarks/data/"
 BASEDIR = "data/"
 
 
@@ -85,7 +84,7 @@ class Dataset():
 
     def default_count(self):
         """ number of neighbors to return """
-        return 100
+        return 10
 
     def short_name(self):
         return f"{self.__class__.__name__}-{self.nb}"
