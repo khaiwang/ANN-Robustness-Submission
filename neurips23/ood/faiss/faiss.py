@@ -1,5 +1,3 @@
-# Only for text2image10M n_list evaluation
-
 import sys
 
 sys.path.append("install/lib-faiss")  # noqa
@@ -63,27 +61,18 @@ class FaissIVF(Faiss):
         print("metric", metric)
 
     def fit(self, dataset):
-        faiss.omp_set_num_threads(64)
+        faiss.omp_set_num_threads(128)
         ds = DATASETS[dataset]()
         d = ds.d
-        centroids = np.load(f"data/text2image1B/ivf_centroids_{self._n_list}.npy")
-        assert centroids.shape[1] == d
-        assert centroids.shape[0] == self._n_list
-        faiss_quantizer = faiss.IndexFlatIP(d)
-        faiss_quantizer.add(centroids)
         faiss_metric = faiss.METRIC_INNER_PRODUCT if self._metric == "angular" else faiss.METRIC_L2
         factory_string = f"IVF{self._n_list},Flat"
         index = faiss.index_factory(d, factory_string, faiss_metric)
-        index.quantizer = faiss_quantizer
-        index.is_trained = True
         X = ds.get_dataset().astype(np.float32)
-        print("Loaded centroids directly")
-        print("Centroids shape", centroids.shape)
-        print("nlist", self._n_list)
-        # index.train(X)
+
+        index.train(X)
         index.add(X)
         self.index = index
-        # faiss.write_index(index, self.index_name(dataset))
+        faiss.write_index(index, self.index_name(dataset))
         
     
     def load_index(self, dataset):
@@ -93,7 +82,7 @@ class FaissIVF(Faiss):
         return False
 
     def set_query_arguments(self, query_arguments):
-        faiss.omp_set_num_threads(64)
+        faiss.omp_set_num_threads(128)
         faiss.cvar.indexIVF_stats.reset()
         self._n_probe = query_arguments.get("n_probe", 32)
         self.index.nprobe = self._n_probe

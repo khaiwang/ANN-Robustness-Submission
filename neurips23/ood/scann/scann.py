@@ -18,6 +18,9 @@ class Scann(BaseOODANN):
         self.config_id = index_params.get('config_id', None)
         self.download = index_params.get('download', False)
         self.tree_size = index_params.get('tree_size', 40_000)
+        self.dim = index_params.get('dim', 200)
+        self.metric = index_params.get('metric', 'ip')
+        self.metric =  'DotProductDistance' if self.metric == 'ip' else 'SquaredL2Distance'
         self.serialized_dir = 'data/scann/ood'
         print('ScaNN: Init')
 
@@ -54,7 +57,7 @@ class Scann(BaseOODANN):
                 os.rename(src, dst)
             self.searcher = scann.scann_ops_pybind.load_searcher(
                 self.serialized_dir)
-            self.searcher.set_num_threads(64)
+            self.searcher.set_num_threads(32)
         else:
             print("ScaNN: Training from scratch.")
             self.fit(dataset)
@@ -66,11 +69,10 @@ class Scann(BaseOODANN):
         print('ScaNN: Training')
         print('This requires more than 16GB of RAM.')
         print('Please download the serialized searcher or use a higher RAM VM.')
-        ds = DATASETS[dataset]()
         config = f"""
       num_neighbors: 10
       distance_measure {{
-        distance_measure: "SquaredL2Distance"
+        distance_measure: {self.metric}
       }}
       partitioning {{
         num_children: { self.tree_size }
@@ -103,9 +105,9 @@ class Scann(BaseOODANN):
         asymmetric_hash {{
           projection {{
             projection_type: CHUNK
-            num_blocks: 50
+            num_blocks: {self.dim // 2}
             num_dims_per_block: 2
-            input_dim: 100
+            input_dim: {self.dim}
           }}
           num_clusters_per_block: 16
           max_clustering_iterations: 30
@@ -113,14 +115,14 @@ class Scann(BaseOODANN):
             distance_measure: "SquaredL2Distance"
           }}
           lookup_type: INT8_LUT16
-          use_residual_quantization: false
+          use_residual_quantization: true
           noise_shaping_threshold: 0.1
           expected_sample_size: 100000
           use_global_topn: true
         }}
       }}
       exact_reordering {{
-        approx_num_neighbors: 150
+        approx_num_neighbors: 100
         bfloat16 {{
           enabled: true
           noise_shaping_threshold: 0.2
@@ -128,9 +130,8 @@ class Scann(BaseOODANN):
       }}
       custom_search_method: "experimental_top_level_partitioner:700,20,3.0,2.5,1.8"
     """
-        print('ScaNN: Config for dataset:', dataset, config)
 
-        
+        ds = DATASETS[dataset]()
         k = ds.default_count()
         self.searcher = (scann.scann_ops_pybind.builder(
             np.zeros([0, ds.d]).astype('float32'), k, 'dot_product')
@@ -166,6 +167,7 @@ class Scann(BaseOODANN):
             pre_reorder_num_neighbors=self.reorder,
             batch_size=12500
         )[0]
+        # print(self.res[20])
 
     def set_query_arguments(self, query_args):
         self.leaves_to_search = query_args['leaves_to_search']

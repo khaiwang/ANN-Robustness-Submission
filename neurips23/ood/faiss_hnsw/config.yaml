@@ -160,3 +160,46 @@ deep-10M:
           {"ef": 280},
           {"ef": 300}
           ]
+
+# amazon-books-4M:
+#   faiss_hnsw:
+#     docker-tag: neurips23-ood-faiss_hnsw
+#     module: neurips23.ood.faiss_hnsw.faiss_hnsw
+#     constructor: FaissHNSW
+#     base-args: ["angular"]
+#     run-groups:
+#       base:
+#         args: |
+#           [{"M": 16, "efConstruction": 300}]
+#         query-args: |
+#           [
+#           {"ef": 20},
+#           {"ef": 40},
+#           {"ef": 60},
+#           {"ef": 80},
+#           {"ef": 100},
+#           {"ef": 120},
+#           {"ef": 140},
+#           {"ef": 160},
+#           {"ef": 180},
+#           {"ef": 200},
+#           {"ef": 220},
+#           {"ef": 240},
+#           {"ef": 260},
+#           {"ef": 280},
+#           {"ef": 300}
+#           ]
+
+amazon-books-4M:
+  faiss_hnsw:
+    docker-tag: neurips23-ood-faiss_hnsw
+    module: neurips23.ood.faiss_hnsw.faiss_hnsw
+    constructor: FaissHNSW
+    base-args: ["angular"]
+    run-groups:
+      base:
+        args: |
+          [{"M": 16, "efConstruction": 300}]
+        query-args: |
+          [
+          {"ef": 120}]

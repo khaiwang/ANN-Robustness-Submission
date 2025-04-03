@@ -8,7 +8,7 @@ corpus = load_dataset("namespace-PT/msmarco-corpus", split="train")['content']
 questions = load_dataset("namespace-PT/msmarco", split="dev")
 pos_count = {}
 
-diskann_doc_90 = h5py.File('msmarco/ip_L_300_R_16_buildthreads_64_Ls_40_T_32.hdf5', 'r+', libver='latest')
+diskann_doc_90 = h5py.File('results/neurips23/ood/msmarco-10M/10/ip_L_300_R_16_buildthreads_64_Ls_40_T_32.hdf5', 'r+', libver='latest')
 diskann_doc_95 = h5py.File('msmarco/ip_L_500_R_32_buildthreads_64_Ls_30_T_32.hdf5', 'r+', libver='latest')
 
 scann_doc_95 = h5py.File('msmarco/ip_download_false_tree_size_40000_leaves_to_search_75_reorder_150.hdf5', 'r+', libver='latest')

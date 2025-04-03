@@ -43,3 +43,26 @@ for i in tqdm(range(0, corpus.shape[0], corpus_batch)):
     print("shape of the corpus embeddings:", corpus_embeddings.shape)
     print("data type of the embeddings: ", corpus_embeddings.dtype)
     np.save(f"corpus_embeddings_{i}.npy", corpus_embeddings)
+
+# For all the ground truths in query datasets, find the corresponding corpus ids
+# and save them in a json file
+import json
+from tqdm import tqdm
+import numpy as np
+from datasets import load_dataset
+
+data = load_dataset("namespace-Pt/msmarco", split="dev")
+corpus = load_dataset("namespace-PT/msmarco-corpus", split="train")
+print("shape of the queries: ", len(data))
+print("shape of the corpus: ", len(corpus))
+ground_truths = {}
+for i in tqdm(range(len(data))):
+    ground_truth = []
+    for gt in data[i]['positive']:
+        for j in range(len(corpus)):
+            if corpus[j]['content'] == gt:
+                ground_truths.append(j)
+    ground_truths[i] = ground_truth
+with open('ground_truths.json', 'w') as f:
+    json.dump(ground_truths, f)
+    

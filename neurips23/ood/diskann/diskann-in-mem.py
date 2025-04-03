@@ -161,6 +161,8 @@ class diskann(BaseOODANN):
         nq, dim = (np.shape(X))
         self.res, self.query_dists = self.index.batch_search(
             X, k, self.Ls, self.search_threads)
+        # print(X[20])
+        # print(self.res[20], self.query_dists[20])
      
 
     def set_query_arguments(self, query_args):

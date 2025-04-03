@@ -20,7 +20,8 @@ from .dataset_io import (
 )
 
 
-BASEDIR = "../big-ann-benchmarks/data/"
+# BASEDIR = "../big-ann-benchmarks/data/"
+BASEDIR = "data/"
 
 
 class Dataset():
@@ -84,7 +85,7 @@ class Dataset():
 
     def default_count(self):
         """ number of neighbors to return """
-        return 10
+        return 100
 
     def short_name(self):
         return f"{self.__class__.__name__}-{self.nb}"
@@ -1056,7 +1057,101 @@ class RandomFilterDS(RandomDS):
     def __str__(self):
         return f"RandomFilter({self.nb})"
 
+class AmazonBooks4M(DatasetCompetitionFormat):
+    def __init__(self):
+        self.nb = 4218641
+        # self.nb = 98794
+        self.nq = 10000
+        self.d = 64
+        self.dtype = 'float32'
+        self.ds_fn = "base.fbin"
+        self.qs_fn = "queries.fbin"
+        # self.gt_fn = "gt_amazon_norm.bin"
+        self.gt_fn = "gt_amazon_test.bin"
+        self.basedir = os.path.join("data", "amazon")
+    
+    def prepare(self, skip_data=False):
+        import numpy as np
+        print("Preparing Amazon Books 4M dataset")
+        if not os.path.exists(self.basedir):
+            print("Amazon Books 4M dataset directory does not exist. Please download the dataset.")
+            return
 
+        if not os.path.exists(os.path.join(self.basedir, self.ds_fn)):
+            if os.path.exists(os.path.join(self.basedir, "item_embeddings.npy")):
+                print("Converting item embeddings to competition format")
+                data = np.load(os.path.join(self.basedir, "item_embeddings.npy"))
+                with open(os.path.join(self.basedir, self.ds_fn), "wb") as f:
+                    np.array([self.nb, self.d], dtype='uint32').tofile(f)
+                    data.astype('float32').tofile(f)
+            else:
+                print("Item embeddings not found. Please download the dataset.")
+                return
+        else:
+            print("check normalizing the embeddings")
+            # read size and dim
+            with open(os.path.join(self.basedir, self.ds_fn), "rb") as f:
+                n, d = np.fromfile(f, dtype='uint32', count=2)
+                print(n, d)
+                data = np.fromfile(f, dtype='float32').reshape(n, d)
+                print(data.shape)
+                print(np.linalg.norm(data, axis=1))
+                print(data[0])
+        
+        if not os.path.exists(os.path.join(self.basedir, self.qs_fn)):
+            if os.path.exists(os.path.join(self.basedir, "valid_user_embeddings.npy")):
+                print("Converting queries to competition format")
+                queries = np.load(os.path.join(self.basedir, "valid_user_embeddings.npy"))
+                with open(os.path.join(self.basedir, self.qs_fn), "wb") as f:
+                    np.array([self.nq, self.d], dtype='uint32').tofile(f)
+                    queries.astype('float32').tofile(f)
+            else:
+                print("Queries not found. Please download the dataset.")
+                return
+        
+        if not os.path.exists(os.path.join(self.basedir, self.gt_fn)):
+            print("Groundtruth not found. Please download the dataset.")
+            return
+        else:
+            print("Groundtruth found.")
+            gt_file = os.path.join(self.basedir, self.gt_fn)
+            with open(gt_file, "rb") as f:
+                nq, k = np.fromfile(f, dtype='uint32', count=2)
+                k = max(k, 100)
+                I = np.fromfile(f, dtype='uint32', count=nq * k).reshape(nq, k)
+                D = np.fromfile(f, dtype='float32', count=nq * k).reshape(nq, k)
+                # update the nq, k to file
+                with open(gt_file, "wb") as f:
+                    np.array([nq, k], dtype='uint32').tofile(f)
+                    I.tofile(f)
+                    D.tofile(f)
+            print("Groundtruth is updated.")
+        
+        print("Amazon Books 4M dataset is ready.")
+    def search_type(self):
+        """
+        "knn" or "range" or "knn_filtered"
+        """
+        return "knn"
+
+    def distance(self):
+        """
+        "euclidean" or "ip" or "angular"
+        """
+        return "ip"
+
+    def data_type(self):
+        """
+        "dense" or "sparse"
+        """
+        return "dense"
+
+    def default_count(self):
+        """number of neighbors to return"""
+        return 50
+
+    def short_name(self):
+        return f"{self.__class__.__name__}-{self.nb}"
 class OpenAIEmbedding1M(DatasetCompetitionFormat):
     def __init__(self, query_selection_random_seed):
         self.seed = query_selection_random_seed
@@ -1147,6 +1242,9 @@ class OpenAIEmbedding1M(DatasetCompetitionFormat):
 
 
 DATASETS = {
+
+    'amazon-books-4M': lambda : AmazonBooks4M(),
+
     'bigann-1B': lambda : BigANNDataset(1000),
     'bigann-100M': lambda : BigANNDataset(100),
     'bigann-10M': lambda : BigANNDataset(10),

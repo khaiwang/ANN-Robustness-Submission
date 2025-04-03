@@ -1,3 +1,6 @@
+import sys
+print("Python version")
+print(sys.version)
 import faiss
 import numpy as np
 from benchmark.datasets import DATASETS
@@ -15,6 +18,8 @@ class FaissHNSW(Faiss):
         ds = DATASETS[dataset]()
         d = ds.d
         X = ds.get_dataset().astype(np.float32)
+        print(f"dataset first 1 row: {X[0]}")
+        print(f"dataset shape: {X.shape}")
         faiss_metric = faiss.METRIC_INNER_PRODUCT if self._metric == "angular" else faiss.METRIC_L2
         factory_string = f"HNSW{self.method_param.get('M', 32)},Flat"
         self.index = faiss.index_factory(d, factory_string, faiss_metric)

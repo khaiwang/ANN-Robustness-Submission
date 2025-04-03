@@ -17,7 +17,6 @@ def compute_recall_without_distance_ties(true_ids, run_ids, count):
 
 def compute_recall_with_distance_ties(true_ids, true_dists, run_ids, count):
     # This function assumes "true_dists" is monotonic either increasing or decreasing
-
     found_tie = False
     gt_size = np.shape(true_dists)[0]
 
@@ -52,6 +51,10 @@ def get_recall_values(true_nn, run_nn, count, count_ties=True):
     # TODO probably not very efficient
     for i in range(len(run_nn)):
         if count_ties:
+            # if i == 55:
+            #     print("run_nn", run_nn[i])
+            #     print("true_ids", true_ids[i])
+            #     print("true_dists", true_dists[i])
             recalls[i], found_tie = compute_recall_with_distance_ties(true_ids[i], true_dists[i], run_nn[i], count)
             if found_tie: queries_with_ties += 1 
         else:
@@ -60,6 +63,85 @@ def get_recall_values(true_nn, run_nn, count, count_ties=True):
             np.std(recalls) / float(count),
             recalls,
             queries_with_ties)
+
+def compute_mrr(true_ids, run_ids, count):
+    for i, id in enumerate(true_ids):
+        if i >= len(run_ids):
+            break
+        if id in run_ids:
+            return count / float(i + 1)
+    return 0.0
+
+def compute_map(true_ids, run_ids, count):
+    num_correct = 0
+    sum_precision = 0.0
+    for i, id in enumerate(true_ids):
+        if i >= len(run_ids):
+            break
+        if id in run_ids:
+            num_correct += 1
+            sum_precision += count * num_correct / float(i + 1)
+    
+    return sum_precision
+
+def compute_ndcg(true_ids, run_ids, count):
+    dcg = 0.0
+    idcg = 0.0
+    for i, id in enumerate(true_ids):
+        if i >= len(run_ids):
+            break
+        if id in run_ids:
+            dcg += 1.0 / np.log2(i + 2)
+    for i in range(min(count, len(true_ids))):
+        idcg += 1.0 / np.log2(i + 2)
+    return dcg / idcg * count
+
+def get_IR_values(true_nn, run_nn, count, name, count_ties=True):
+    true_ids, _ = true_nn
+    # order the run_nn by distance
+
+    if not count_ties:
+        true_ids = true_ids[:, :count]
+        assert true_ids.shape == run_nn.shape
+    metric_values = np.zeros(len(run_nn))
+    # TODO probably not very efficient
+    for i in range(len(run_nn)):
+        if name == "mrr":
+            metric_values[i] = compute_mrr(true_ids[i], run_nn[i], count)
+        elif name == "map":
+            metric_values[i] = compute_map(true_ids[i], run_nn[i], count)
+        elif name == "ndcg":
+            metric_values[i] = compute_ndcg(true_ids[i], run_nn[i], count)
+    return (np.mean(metric_values),
+            np.std(metric_values),
+            metric_values)
+def tail_knn(true_nn, run_nn, count, metrics, tail_percentile):
+    s = "tail" + str(tail_percentile)
+    # tail percentile is a number at the right of the decimal point, can be 99, 999, 9999, etc
+    # get the digit at the right of the decimal point by dividing by 10 until the number is less than 1
+    tail = tail_percentile
+    while tail >= 100.0:
+        tail /= 10.0
+
+
+    print("tail: ", tail)
+    if "knn" not in metrics:
+        print("Computing knn metrics")
+        knn_metrics = metrics.create_group("knn")
+        mean, std, recalls, queries_with_ties = get_recall_values(true_nn, run_nn, count)
+        if queries_with_ties>0:
+            print("Warning: %d/%d queries contained ties accounted for in recall" % (queries_with_ties, len(run_nn)))
+        knn_metrics.attrs["mean"] = mean
+        knn_metrics.attrs["std"] = std
+        knn_metrics["recalls"] = recalls
+    else:
+        print("Found cached recall result")
+    if s not in metrics["knn"]:        
+        print("Computing tail metrics", s)
+        metrics["knn"].attrs[s] = np.percentile(np.array(metrics["knn"]["recalls"]), 100 - tail)
+    else:
+        print("Found cached tail result", s)
+    return metrics["knn"].attrs[s]/count
 
 def knn(true_nn, run_nn, count, metrics):
     if 'knn' not in metrics:
@@ -151,7 +233,7 @@ def cdf(dataset_distances, run_distances, count, metrics):
 
 def robustness(dataset_distances, run_distances, count, metrics, robust_threshold):
     # name robustness: robustness + threshold * 100 round to integer  
-    s = "robustness@" + str(robust_threshold)
+    s = "robustness-" + str(robust_threshold) + "@" + str(count)
     delta = robust_threshold
     print("delta", delta)
     if "knn" not in metrics:
@@ -270,6 +352,46 @@ all_metrics = KeyAwareDefaultDict(robustness_metric, {
         "description": "List of consecutive search times for the same run parameter",
         "function": lambda true_nn, run_nn, metrics, run_attrs: run_attrs.get("search_times",[]), 
         "worst": float("inf")
+    },
+    "mrr": {
+        "description": "Mean Reciprocal Rank",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: IR(true_nn, run_nn, run_attrs["count"], metrics, 'mrr'),
+        "worst": float("-inf"),
+        "lim": [0.0, 1.03],
+    },
+
+    "map": {
+        "description": "Mean Average Precision",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: IR(true_nn, run_nn, run_attrs["count"], metrics, 'map'),
+        "worst": float("-inf"),
+        "lim": [0.0, 1.03],
+    },
+
+    "ndcg": {
+        "description": "Mean Normalized Discounted Cumulative Gain",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: IR(true_nn, run_nn, run_attrs["count"], metrics, 'ndcg'),
+        "worst": float("-inf"),
+        "lim": [0.0, 1.03],
+    },
+    "tail99": {
+        "description": "Recall at 99th percentile",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: tail_knn(true_nn, run_nn, run_attrs["count"], metrics, 99),
+        "worst": float("-inf"),
+        "lim": [-0.03, 1.03],
+    },
+
+    "tail999": {
+        "description": "Recall at 99.9th percentile",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: tail_knn(true_nn, run_nn, run_attrs["count"], metrics, 999),
+        "worst": float("-inf"),
+        "lim": [-0.03, 1.03],
+    },
+
+    "tail95": {
+        "description": "Recall at 95th percentile",
+        "function": lambda true_nn, run_nn, metrics, run_attrs: tail_knn(true_nn, run_nn, run_attrs["count"], metrics, 95),
+        "worst": float("-inf"),
+        "lim": [-0.03, 1.03],
     },
 
 })
