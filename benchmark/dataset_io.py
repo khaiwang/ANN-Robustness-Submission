@@ -129,6 +129,7 @@ def range_result_read(fname):
 
 def knn_result_read(fname):
     n, d = map(int, np.fromfile(fname, dtype="uint32", count=2))
+    print("n, d", n, d)
     assert os.stat(fname).st_size == 8 + n * d * (4 + 4)
     f = open(fname, "rb")
     f.seek(4+4)
