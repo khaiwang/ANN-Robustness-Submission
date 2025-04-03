@@ -35,6 +35,8 @@ The format of the figures name is as follows:
 2. The general format is `<dataset_name>-<scale>-<x-axis>-<xscale>-<y-axis>-<yscale>.png`
 3. For cdf figures, the format is `<dataset_name>-<scale>-<x-axis>-<xscale>-<y-axis>-<yscale>-robustness%d.png` where the %d represents the fixed average recall %d % (90% in our evaluation). x-axis and y-axis is meaningless for the cdf figures.
 4. In our evaluation, we fix the bounds of average recall for better visualization. The bounds can be set be setting the `--fix-metric k-nn` and `--min 70 --max 95`. Detailed parameters can be found in the `plot.py` file or `plot.py -h` for help.
+5. In figure 9 we also show the results for K=100, it can be completed by setting `-count 100` when running the `robustness_evaluation.py` script. However, The deployment code provided by ScaNN and Puck depand on the `ds.default_count()` function, so when testing with k=100, we need to manually set the `default_count` return value to 100 in the `benchmark/dataset.py` file for the `Text2Image1B` class and the `Dataset` class.
+Besides, ScaNN relies on a manual parameter configuration in `neurips23/ood/scann/scann.py`. In order to run the evaluation with k=100, we need to set the `num_neighbors` parameter in the config variable to 100, (refer to the comments in the code). We expect to make it more automatic in the future.
 ## Eval2: Three-Way Tradeoffs
 Evaluation corresponds to Figure 10 and 11 in the paper. (k=10)
 For Figure 10 in the paper:
