@@ -1,7 +1,7 @@
 import argparse
 import os
 
-def generate_plot_commands(dataset=None, count=10):
+def generate_plot_commands(dataset=None, count=10, min_recall=0.70, max_recall=0.95):
     robustness = [0.1, 0.3, 0.5, 0.7, 0.9]
     fixed_recall = 90
     datasets = []
@@ -11,11 +11,10 @@ def generate_plot_commands(dataset=None, count=10):
         datasets.append(dataset)
     commands = []
     for dataset in datasets:
-        commands.append(f"python plot.py -x k-nn -y qps --dataset {dataset} --neurips23track ood --count {count} --recompute",)
+        commands.append(f"python plot.py -x k-nn -y qps --dataset {dataset} --neurips23track ood --count {count} --recompute --fix-metric k-nn --min {min_recall} --max {max_recall} -T filter")
         for r in robustness:
-            commands.append(f"python plot.py -x robustness@{r} -y qps --dataset {dataset} --neurips23track ood --count {count}")
-            commands.append(f"python plot.py -x k-nn -y robustness@{r} --raw --dataset {dataset} --neurips23track ood --count {count} -T cdf --fixed-recall {fixed_recall}")
-
+            commands.append(f"python plot.py -x robustness@{r} -y qps --dataset {dataset} --neurips23track ood --count {count} --fix-metric k-nn --min {min_recall} --max {max_recall} -T filter")
+            commands.append(f"python plot.py -x k-nn -y robustness@{r} --dataset {dataset} --neurips23track ood --count {count} --fix-metric k-nn --min {min_recall} --max {max_recall} -T filter")
         commands.append(f"python plot.py -x k-nn -y qps --raw --dataset {dataset} --neurips23track ood --count {count} -T cdf --fix-recall {fixed_recall}")
         
     return commands
@@ -55,9 +54,11 @@ def main():
                         choices=["plot", "install", "run"],
                         help="Specify the mode, options are plot, install, run.")
     parser.add_argument("--count", type=int, required=False, help="Specify the number of topk.", default=10)
+    parser.add_argument("--max_recall", type=int, required=False, help="Specify the max recall.", default=0.95)
+    parser.add_argument("--min_recall", type=int, required=False, help="Specify the min recall.", default=0.70)
     args = parser.parse_args()
     if args.run == "plot":
-        commands = generate_plot_commands(args.dataset, args.count)
+        commands = generate_plot_commands(args.dataset, args.count, args.min_recall, args.max_recall)
     elif args.run == "install":
         commands = generate_install_commands()
     elif args.run == "run":

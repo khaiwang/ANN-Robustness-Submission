@@ -69,6 +69,8 @@ class Scann(BaseOODANN):
         print('ScaNN: Training')
         print('This requires more than 16GB of RAM.')
         print('Please download the serialized searcher or use a higher RAM VM.')
+        # Fail to load the count parameter during runtime. Specify the num_beighbors 
+        # in config when changing the topK parameter.
         config = f"""
       num_neighbors: 10
       distance_measure {{
