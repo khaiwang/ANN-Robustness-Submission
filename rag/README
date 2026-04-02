@@ -1,6 +1,27 @@
 # Vector Index RAG Evaluation
-This directory is for the RAG evaluation based on vector index search results.
-We use MSMARCO dataset for the evaluation.
-The evaluation code is adopted from [RGB](https://github.com/chen700564/RGB) project
 
-See evaluate.sh for the evaluation script.
+End-to-end RAG evaluation demonstrating that vector index robustness predicts application accuracy.
+
+## Applications
+
+### Naive RAG Q&A (MSMARCO)
+- Corpus: MSMARCO 8.8M passages, encoded with LLM-Embedder (768-dim, inner product)
+- LLM: Gemini-2.0-Flash (via OpenRouter)
+- Indexes: HNSW, IVFFlat, ScaNN, DiskANN (K=10)
+- Judge: GPT-4o-mini, verified with Gemini-2.0-Flash
+- Script: `naive_rag_pipeline.py`
+
+### Agentic RAG (HotpotQA)
+- Corpus: Wikipedia 18M passages, encoded with E5
+- Models: Search-R1 (Qwen2.5-7B) and Qwen3-30B-A3B (via vLLM)
+- Indexes: HNSW, IVF (K=5)
+- Judge: GPT-4o-mini
+- Script: `agentic_rag_pipeline.py`
+- Doc validity analysis: `judge_doc_validity.py`
+
+## Data Preparation
+- `encode_dataset.py`: Encode corpus with embedding model
+- `calculate_gt.py`: Compute K-NN ground truth from embeddings
+- `generate_rag_q_corpus_pairs.py`: Generate Q-A-document triplets from vector search results
+- `build_indices.py`, `build_hnsw.py`: Build HNSW/IVF indices for agentic RAG
+- `gt.json`: MSMARCO ground truth (query-answer pairs)

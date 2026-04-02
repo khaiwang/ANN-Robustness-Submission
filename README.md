@@ -1,52 +1,65 @@
-# ANN Robustness
-This is the codebase of our VLDB'26 submission: Towards Robustness: A Critique of Current Vector Database
-Assessments.
-We extend the Big-ANN-Benchmarks:
-## Robustness Metric
-#### Robustness@$\delta$ metric support
-By assigning the `x-axis` or `y-axis` to the `robustness@`$\delta$. $\delta$ is a customized threshold to show the number of queries with recall $\ge\ \delta$) metric, we can plot the robustness metric with a fixed average recall.
-#### Benchmark dockers according to the paper setup.
-We adopted the neurips23track ood setup to run our evaluation, as it is the latest setup and contains up-to-date datasets and algorithms.
-* Install the requirements in the requirements_py3.10.txt
-* Indices support: ScaNN, Zilliz, Puck, DiskANN, Faiss and Faiss-hnsw
-* Dataset: Text2Image10M, MSSPACEV10M, DEEP10M, and our customized MSMARCO for RAG
-    * We apply the setup of ScaNN Zilliz Puck and DiskANN in the original ood track as they have been tuned for this out-of-distribution setup.
-    * On other datasets, we use default setting and tune the parameters to limit them to a similar average recall rate.
-* The evaluation script can be found in the robustness_evaluation.py
-#### Plotting: Filter with a third condition beyond -x and -y, Robustness@$\delta$ figure with a fixed average recall.
-1. For the figure with filter, use `--plot-type filter` to plot the figure with a third condition.
-For this figure, use `--fix-metric` to denote the metric used for filtering, `--min` and `--max` to denote the range of the third condition
-2. For the figure with robustness@$\delta$, use `--plot-type cdf` to plot the figure with a fixed average recall.
-Use `--fix-recall` to denote the fixed average recall for the robustness plot.
-## RAG
-1. MSMARCO (Emebdding with LLM-Embedder) for RAG evaluation.
-2. Embedding the dataset with LLM with LLM-Embedder.
-3. Filter the question set, keep the queries that LLM can answer with the embedded top-10 KNN ground truth.
-4. RAG with the embedded corpus and ANN results. 
-Note that the current workflow is not automated, should manually run the vector search and use the results to run RAG.
-5. RAG Evaluation
+# ANN Robustness Benchmark
 
----
-Below is the original Big-ANN-Benchmarks README contents, the corresponding environment is in the `requirements_py3.10.txt` file. 
----
+Artifact for *"Towards Robustness: A Critique of Current Vector Database Assessments"* (VLDB 2026).
 
+We extend [Big-ANN-Benchmarks](http://big-ann-benchmarks.com/) with the Robustness-delta@K metric and evaluate 6 vector indexes on 4 datasets.
 
-# Big ANN Benchmarks
+## Quick Start: Reproduce Paper Figures
 
-<http://big-ann-benchmarks.com/>
+```bash
+pip install -r requirements.txt
+cd scripts && python generate_all_figures.py
+```
 
-## Datasets
+Figures are written to `output/`. No datasets, Docker, or HDF5 files needed.
 
-See <http://big-ann-benchmarks.com/> for details on the different datasets.
+## Benchmark Setup
 
-## NeurIPS 2023 competition: Practical Vector Search
+### Indexes
+HNSW (Faiss), DiskANN, Zilliz, IVFFlat (Faiss), ScaNN, Puck
 
-Please see [this readme](./neurips23/README.md) for a guide to the NeurIPS 23 competition.
+### Datasets
+Text-to-Image-10M, MSSPACEV-10M, DEEP-10M (from Big-ANN-Benchmarks NeurIPS'23 OOD track), and MSMARCO (8.8M passages, encoded with LLM-Embedder, 768-dim inner product).
 
-## NeurIPS 2021 competition: Billion-Scale ANN 
+Zilliz is excluded from MSMARCO due to a bug in its Docker image quantizing 768-dim vectors.
 
-Please see [this readme](./neurips21/README.md) for a guide of running billion-scale benchmarks and a summary of the results from the NeurIPS 21 competition.
+### RAG Applications
+- Naive RAG Q&A: MSMARCO + Gemini-2.0-Flash, 4 indexes, K=10
+- Agentic RAG: HotpotQA + Search-R1 (Qwen2.5-7B and Qwen3-30B-A3B), HNSW vs IVF, K=5
 
-# Credits
+## Data
 
-This project is a version of [ann-benchmarks](https://github.com/erikbern/ann-benchmarks) by [Erik Bernhardsson](https://erikbern.com/) and contributors targeting evaluation of algorithms and hardware for newer billion-scale datasets and practical variants of nearest neighbor search.
+Pre-computed CSV data from benchmark results. See `data/README_DATA.md` for schemas.
+
+| Directory | Content |
+|---|---|
+| `data/aggregate/` | Per-configuration metrics: recall, robustness at 5 delta thresholds, QPS |
+| `data/cdf/` | 11-point robustness CDF at recall~0.9 (one config per algorithm per dataset) |
+| `data/metric_comparison/` | Extended metrics (MAP, NDCG, MRR, percentiles) for Section 4 analysis |
+| `data/rag/` | End-to-end RAG accuracy for naive and agentic setups |
+
+## Figure Map
+
+| Paper Figure | Section | Script | Data |
+|---|---|---|---|
+| Fig 1 | 1 | `fig01_recall_distribution.py` | `cdf/msmarco_10M_k10_cdf.csv` |
+| Fig 2 | 2 | (static illustration) | -- |
+| Fig 3 | 4 | `fig03_metric_correlation.py` | `metric_comparison/all_datasets_all_metrics.csv` |
+| Fig 4--5 | 5 | (LaTeX tables) | -- |
+| Fig 6 | 5.1 | `fig06_cdf_split.py` | `cdf/text2image_10M_k{10,100}_cdf.csv` |
+| Fig 7 | 5.1 | `fig07_cdf_stacked.py` | `cdf/{msspacev,deep,msmarco}_10M_k10_cdf.csv` |
+| Fig 8 | 5.1 | `fig08_recall_robustness.py` | `aggregate/text2image_10M_k10.csv` |
+| Fig 9 | 5.2 | `fig09_tradeoff.py` | `aggregate/text2image_10M_k10.csv` |
+| Fig 10--11 | 5.3 | (LaTeX tables) | -- |
+| Fig 12 | 5.3 | `fig12_rag.py` | `rag/rag_results.csv` |
+| Fig 13--14 | 5.4 | (pre-generated from Eval 1 results) | -- |
+
+## Running the Full Benchmark from Scratch
+
+See `README_SUBMISSION.md` for step-by-step instructions to reproduce all experiments from raw datasets. This requires Docker, the Big-ANN-Benchmarks datasets, and API keys for RAG evaluation.
+
+The `extract/` directory contains the scripts used to produce CSV data from raw HDF5 results. See `extract/README_EXTRACT.md`.
+
+## Credits
+
+This project extends [Big-ANN-Benchmarks](https://github.com/harsha-simhadri/big-ann-benchmarks) (NeurIPS'23 OOD track).

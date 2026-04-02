@@ -6,7 +6,7 @@ def generate_plot_commands(dataset=None, count=10, min_recall=0.70, max_recall=0
     fixed_recall = 90
     datasets = []
     if dataset is None:
-        datasets = ["msspacev-10M", "deep-10M", "text2image-10M"]
+        datasets = ["msspacev-10M", "deep-10M", "text2image-10M", "msmarco-10M"]
     else:
         datasets.append(dataset)
     commands = []
@@ -30,10 +30,10 @@ def generate_install_commands():
     return commands
 
 def generate_run_commands(dataset=None, count=10):
-    indices = ["scann", "zilliz", "diskann", "faiss-ivf", "faiss_hnsw", "puck"]
+    indices = ["scann", "zilliz", "diskann", "faiss-ivf", "faiss-ivfpqfs", "faiss_hnsw", "puck"]
     datasets = []
     if dataset is None:
-        datasets = ["msspacev-10M", "deep-10M", "text2image-10M"]
+        datasets = ["msspacev-10M", "deep-10M", "text2image-10M", "msmarco-10M"]
     else:
         datasets.append(dataset)
     print("Running the index dockers.")
@@ -47,12 +47,29 @@ def generate_run_commands(dataset=None, count=10):
             commands.append(f"python run.py --neurips23track ood --algorithm {index} --dataset {dataset} --count {count}")
     return commands
 
+def generate_run_k100_commands():
+    """Run HNSW with K=100 on text2image for the retrieve-and-rerank analysis (§5.4)."""
+    commands = [
+        "python run.py --neurips23track ood --algorithm faiss_hnsw --dataset text2image-10M --count 100 --force"
+    ]
+    return commands
+
+
+def generate_analysis_commands():
+    """Run metric comparison (§4) and index family analysis (§5.4)."""
+    commands = [
+        'bash run_metric_comparison.sh',
+        'PYTHONPATH="." python analyze_index_families.py',
+    ]
+    return commands
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate plot commands with a specified dataset.")
     parser.add_argument("--dataset", type=str, required=False, help="Specify the dataset to use.")
-    parser.add_argument("--run", type=str, required=True, 
-                        choices=["plot", "install", "run"],
-                        help="Specify the mode, options are plot, install, run.")
+    parser.add_argument("--run", type=str, required=True,
+                        choices=["plot", "install", "run", "run-k100", "analyze"],
+                        help="Specify the mode: plot, install, run (§5.1), run-k100 (§5.4), analyze (§4+§5.4).")
     parser.add_argument("--count", type=int, required=False, help="Specify the number of topk.", default=10)
     parser.add_argument("--max_recall", type=int, required=False, help="Specify the max recall.", default=0.95)
     parser.add_argument("--min_recall", type=int, required=False, help="Specify the min recall.", default=0.70)
@@ -63,6 +80,10 @@ def main():
         commands = generate_install_commands()
     elif args.run == "run":
         commands = generate_run_commands(args.dataset, args.count)
+    elif args.run == "run-k100":
+        commands = generate_run_k100_commands()
+    elif args.run == "analyze":
+        commands = generate_analysis_commands()
     else:
         raise ValueError(f"Invalid run mode: {args.run}")
     for command in commands:

@@ -1,66 +1,126 @@
-# Documentation for the Robustness Evaluation
-## Eval1: Index Performance
-Evaluation corresponds to Figure 6, 7, 8 and 9 in the paper. (k=10)
-In this evaluation, we compare the performance of different indices on Text-to-Image, MSSPACEV and DEEP.
-For details about scripts and build instructions, please refer to the README file.
-0. Install all the requirements in the `requirements_py3.10.txt` file in a virtual environment.
-```shell
-python3 -m venv bigann
-source bigann/bin/activate
-pip install -r requirements_py3.10.txt
+# Reproducing All Experiments from Scratch
+
+This document describes how to reproduce all benchmark results from raw datasets.
+For generating paper figures from pre-computed CSV data, see `README.md`.
+
+## Prerequisites
+
+- Python 3.10+ virtual environment
+- Docker 27+
+- Datasets: Text-to-Image-10M, MSSPACEV-10M, DEEP-10M (from Big-ANN-Benchmarks), MSMARCO (encoded with LLM-Embedder)
+- For RAG: API keys for OpenRouter (Gemini-2.0-Flash, GPT-4o-mini judges), vLLM server for Search-R1/Qwen3-30B
+
+```bash
+python3 -m venv bigann && source bigann/bin/activate
+pip install -r requirements.txt        # minimal deps for plotting and extraction
+pip install -r requirements_py3.10.txt  # full deps if running benchmarks locally (Python 3.10)
 ```
 
-1. Install indexes dockers according to the paper setup. All the dockerfiles can be found in `neurips23/ood/`
-```shell
+Note: The benchmark indexes run inside Docker containers with their own environments. The host machine only needs `requirements.txt` for metric extraction and figure generation. `requirements_py3.10.txt` contains pinned versions for the full Big-ANN-Benchmarks framework and may require Python 3.10.
+
+## Eval 1: Index Performance (Section 5.1, Figs 6--8)
+
+Evaluates 6 indexes on 4 datasets with K=10. Produces CDF robustness curves and recall-robustness scatter plots.
+
+**Indexes**: HNSW, DiskANN, Zilliz, IVFFlat, ScaNN, Puck
+**Datasets**: Text-to-Image-10M, MSSPACEV-10M, DEEP-10M, MSMARCO
+**Note**: Zilliz is excluded from MSMARCO (Docker image bug quantizing 768-dim vectors).
+
+```bash
+# 1. Install index Docker images
 python robustness_evaluation.py --run install
-```
 
-2. Run the evaluation script to generate the results. The evaluation script is `robustness_evaluation.py` in the root directory.
-All the results will be saved in the `results/neurips23/ood/` directory.
-```shell
+# 2. Run benchmarks (results saved to results/neurips23/ood/)
 python robustness_evaluation.py --run run --count 10
-```
-This script will run all the six indexes with the corresponding configurations on Text-tlo-Image, MSSPACEV and DEEP datasets.
-The configurations are defined in the `neurips23/ood/<index_name>/config.yaml` file.
-Index code is in the `neurips23/ood/<index_name>/<index_name>.py` file.
 
-3. Plot all the results as shown in the paper.
-```shell
-python robustness_evaluation.py --run plot --count 10
+# 3. Extract metrics to CSV
+#    extract_all_metrics.py outputs to data/OverallEval/
+#    extract/ scripts output to their sibling data/ directory (using __file__-relative paths)
+#    These must be run from the benchmark root with access to results/ and datasets
+PYTHONPATH="." python extract_all_metrics.py
+
+# 4. Generate figures
+cd scripts && python fig06_cdf_split.py && python fig07_cdf_stacked.py && python fig08_recall_robustness.py
 ```
-This script will plot all the results in the `results/neurips23/ood/` directory.
-The results will be saved in the `results/figures/<dataset_name>/` directory.
-The format of the figures name is as follows:
-1. Results for each topk will be saved in a separate folder `results/figures/<dataset_name>/<topk>/`
-2. The general format is `<dataset_name>-<scale>-<x-axis>-<xscale>-<y-axis>-<yscale>.png`
-3. For cdf figures, the format is `<dataset_name>-<scale>-<x-axis>-<xscale>-<y-axis>-<yscale>-robustness%d.png` where the %d represents the fixed average recall %d % (90% in our evaluation). x-axis and y-axis is meaningless for the cdf figures.
-4. In our evaluation, we fix the bounds of average recall for better visualization. The bounds can be set be setting the `--fix-metric k-nn` and `--min 70 --max 95`. Detailed parameters can be found in the `plot.py` file or `plot.py -h` for help.
-5. In figure 9 we also show the results for K=100, it can be completed by setting `-count 100` when running the `robustness_evaluation.py` script. However, The deployment code provided by ScaNN and Puck depand on the `ds.default_count()` function, so when testing with k=100, we need to manually set the `default_count` return value to 100 in the `benchmark/dataset.py` file for the `Text2Image1B` class and the `Dataset` class.
-Besides, ScaNN relies on a manual parameter configuration in `neurips23/ood/scann/scann.py`. In order to run the evaluation with k=100, we need to set the `num_neighbors` parameter in the config variable to 100, (refer to the comments in the code). We expect to make it more automatic in the future.
-## Eval2: Three-Way Tradeoffs
-Evaluation corresponds to Figure 10 and 11 in the paper. (k=10)
-For Figure 10 in the paper:
-1. 10 (a) is generated by `--k-nn --qps`, 10 (b)-(f) are generated by `--robustness@x --qps`, where x is the corresponding delta value (0.1 to 0.9). All the figures are generated by fixing the average recall to 70%-95%.
-2. 11 is generated by plotting figures with two metrics while fixing the third one.
-(a) is generated by `--robustness@x --qps` with `--fixed-metric k-nn`, `--min 85` or `--min 90`.
-(b) is generated by `--k-nn --qps` with `--fixed-metric robustness@0.3`, `--min 0.95` or `--min 0.99`.
-(c) is generated by `--k-nn --robustness-0.3@10` with `--fixed-metric qps`, `--min 50000` or `--min 100000`.
-Note that the plots only show original figures seperately for the sake of clarity. We combine the figures for better illustration in the paper.
-## Eval3: RAG
-Evaluation corresponds to Figure 12 in the paper. The workflow is as follows:
-1. MSMARCO (Emebdding with LLM-Embedder) for RAG evaluation.
-2. Embedding the dataset with LLM with LLM-Embedder.
-3. Filter the question set, keep the queries that LLM can answer with the embedded top-10 KNN ground truth.
-4. RAG with the embedded corpus and ANN results. 
-Note that the current workflow is not automated, should manually run the vector search and use the results to run RAG.
-5. RAG Evaluation
-For detailed scripts, please refer to the `rag/evaluate.sh` file.
-## Eval4: Robustness for Index and Tuning
-Evaluation of index parameters as shown in Figure 13 (HNSW) and Figure 14 (IVFFlat) in the paper.
-1. HNSW: All the results have been generated in Eval1. Use `plot.py` with `--definitions faiss_hnsw` to collect the results for HNSW.
-2. IVFFlat: All the results have been generated in Eval1. Use `plot.py` with `--definitions faiss-ivf` to collect the results for IVFFlat.
-Unfortunately, the benchmark plotting framework does not support plotting the results of one index with different parameters using multiple lines. We collect the results and plot the results manually.
-## Metric Comparison (Section 4)
-We also implementd metrics mentioned in Section 4 of the paper. We get the results of common metrics in IR by replacing the axis with `mrr`, `ndcg` and `map` when calling `plot.py`.
-For percentile comparison, we use `tail95`, `tail99` and `tail999` to represent the 95th, 99th and 99.9th percentile of the recall.
+
+Index configurations are in `neurips23/ood/<index_name>/config.yaml`.
+Index implementations are in `neurips23/ood/<index_name>/<index_name>.py`.
+
+**K=100 evaluation** (for Fig 6, bottom row): Set `--count 100` when running. Note that ScaNN and Puck depend on `ds.default_count()`, so you must manually set the return value to 100 in `benchmark/datasets.py` for the `Text2Image1B` and `Dataset` classes. For ScaNN, also set `num_neighbors=100` in `neurips23/ood/scann/scann.py`.
+
+## Eval 2: Three-Way Tradeoff (Section 5.2, Fig 9)
+
+Shows recall-robustness-throughput tradeoff for Zilliz and ScaNN on Text-to-Image-10M.
+Uses results from Eval 1 (no additional benchmark runs needed).
+
+```bash
+cd scripts && python fig09_tradeoff.py
+```
+
+## Eval 3: RAG Applications (Section 5.3, Fig 12)
+
+Two RAG applications demonstrating that robustness predicts end-to-end accuracy.
+
+### Naive RAG Q&A (MSMARCO)
+- LLM: Gemini-2.0-Flash (via OpenRouter)
+- Embedder: LLM-Embedder (768-dim, inner product)
+- Indexes: HNSW, IVFFlat, ScaNN, DiskANN (K=10)
+- Judge: GPT-4o-mini (via OpenRouter), verified with Gemini-2.0-Flash
+
+```bash
+cd rag
+python naive_rag_pipeline.py --openrouter-key <KEY>
+```
+
+### Agentic RAG (HotpotQA)
+- Models: Search-R1 (Qwen2.5-7B) and Qwen3-30B-A3B (via vLLM)
+- Corpus: Wikipedia 18M passages, encoded with E5
+- Indexes: HNSW, IVF (K=5)
+- Judge: GPT-4o-mini (via OpenRouter)
+
+```bash
+cd rag
+# Build indices (requires E5 flat index and corpus)
+python agentic_rag_pipeline.py prepare-index
+
+# Run evaluation (requires vLLM server)
+python agentic_rag_pipeline.py run --vllm-url http://localhost:8001/v1
+
+# Judge results
+python agentic_rag_pipeline.py judge --openrouter-key <KEY>
+```
+
+### Generate RAG figure
+```bash
+cd scripts && python fig12_rag.py
+```
+
+## Eval 4: Index Family Analysis (Section 5.4, Figs 13--14)
+
+Parameter study for HNSW (M, efSearch) and IVFFlat (n_probe) on Text-to-Image-10M.
+Uses results from Eval 1.
+
+```bash
+# HNSW parameter study
+python plot.py -x k-nn -y qps --dataset text2image-10M --neurips23track ood \
+    --count 10 --definitions neurips23/ood/faiss_hnsw/config.yaml
+
+# IVFFlat parameter study
+python plot.py -x k-nn -y qps --dataset text2image-10M --neurips23track ood \
+    --count 10 --definitions neurips23/ood/faiss/config.yaml
+```
+
+Results are plotted manually for the paper (the benchmark framework does not support multi-line parameter sweeps natively). The `analyze_index_families.py` script provides GT rank distribution analysis and K=100 retrieve-and-rerank analysis.
+
+## Eval 5: Metric Comparison (Section 4, Fig 3)
+
+Systematic r^2 correlation analysis between Robustness-delta and average Recall@10, compared with MAP, NDCG, MRR, and percentile metrics across all 4 datasets.
+
+```bash
+# Extract all metrics (recall, robustness, MAP, NDCG, MRR, percentiles)
+PYTHONPATH="." python extract_all_metrics.py
+
+# Generate correlation heatmap
+cd scripts && python fig03_metric_correlation.py
+```
 

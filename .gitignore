@@ -1,8 +1,18 @@
 .DS_Store
 *.pyc
 *.o
+__pycache__/
 
-data/*
+# Large data files (datasets, HDF5 results, indices)
+data/search-r1/
+data/msmarco/
+data/OverallEval/
+*.hdf5
+*.bin
+*.npy
+*.index
+*.faissivfindex
+*.puckindex
 *.class
 
 *.log
@@ -10,6 +20,13 @@ data/*
 results/*
 !results/*.png
 
+output/
+
 venv
 
 .idea
+
+# RAG traces and large outputs
+rag/output/
+rag/result-*
+logs_16cpu/
